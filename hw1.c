@@ -20,8 +20,10 @@ int ** init_matrix(int size){
 int** read_matrix(char* file_name){
     FILE *file;
     file = fopen(file_name,"r");
-    if (file == NULL)
+    if (file == NULL){
         exit(1);
+        printf("file not found");
+    }
     int size = 0;
     fscanf( file, "%d",&size);
 
@@ -48,10 +50,24 @@ int** read_matrix(char* file_name){
 
     return matrix;
 }
+int** get_element_cofactor(int** matrix,int size,int x,int y){
+    // int temp [size][size];
 
+    return 0;
+}
 int main(int argc , char **argv){
 
-    int** matrix = read_matrix("matrix.txt");
+    // int size = atoi(argv[1]);
+    int size = 4;
+    char file_name[20];
+    snprintf(file_name, 20, "matrix_size%d.txt", size);
+    int** matrix = read_matrix(file_name);
+
+    // int d = determinant(matrix, size);
+    // if (d == 0)
+    // printf("\nInverse of Entered Matrix is not possible\n");
+    // else
+    
     return 0;
 }
 
