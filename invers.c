@@ -1,30 +1,54 @@
 #include<stdio.h>
 #include<math.h>
 #include <time.h>
+#define N 100
 
 float determinant(float [][25], float);
 void cofactor(float [][25], float);
 void transpose(float [][25], float [][25], float);
+int determinantOfMatrix(int matrix[25][25], int size);
+void element_cofactor(int matrix[N][N], int temp[N][N], int p, int q, int size);
+void print_matix(){
+
+}
 int main()
 {
-    float a[25][25], k, d;
-    int i, j;
+    float b[25][25], size, d;
+    // int i, j;
     printf("Enter the order of the Matrix : ");
-    scanf("%f", &k);
-    for (i = 0;i < k; i++)
-    {
-        for (j = 0;j < k; j++)
-       {
-            a[i][j] = rand() % 4;
-        }
-    }
+    scanf("%f", &size);
+    // for (i = 0;i < size; i++)
+    // {
+    //     for (j = 0;j < size; j++)
+    //    {
+    //         a[i][j] = rand()%10 +0.0f;
+    //     }
+    // }
+
+    // 3 5 2 1 5  8 3 9 2
+    // float a[25][25]= {
+    //   {3,5,2}, 
+    //   {1,5,8}, 
+    //   {3,9,2},}; 
+
+    int a[25][25] = {{1, 0, 2, -1}, 
+                     {3, 0, 0, 5}, 
+                     {2, 1, 4, -3}, 
+                     {1, 0, 5, 0} 
+                    }; 
+
     clock_t time = clock();
   
-    d = determinant(a, k);
+    d = determinant(a, size);
+    printf("%f\n",d);
+
+    // d = determinantOfMatrix(a,size);
+    // printf("%d\n",d);
+    
     if (d == 0)
         printf("\nInverse of Entered Matrix is not possible\n");
     else
-    cofactor(a, k);
+    cofactor(a, size);
 
     time = clock() - time; 
     double time_taken = ((double)time)/CLOCKS_PER_SEC; // in seconds 
@@ -33,7 +57,108 @@ int main()
     
 }
  
-/*For calculating Determinant of the Matrix */
+ void element_cofactor(int matrix[N][N], int temp[N][N], int p, int q, int size) 
+{ 
+    int i = 0, j = 0; 
+  
+    for (int row = 0; row < size; row++) 
+    { 
+        for (int col = 0; col < size; col++) 
+        { 
+            //store only those element which aren't in given row and column 
+            if (row != p && col != q) 
+            { 
+                temp[i][j++] = matrix[row][col]; 
+  
+                //Row is filled, go to next row
+                if (j == size - 1) 
+                { 
+                    j = 0; 
+                    i++; 
+                } 
+            } 
+        } 
+    } 
+} 
+
+void getCofactor2(int mat[N][N], int temp[N][N], int p, int q, int n) 
+{ 
+    int i = 0, j = 0; 
+  
+    // Looping for each element of the matrix 
+    for (int row = 0; row < n; row++) 
+    { 
+        for (int col = 0; col < n; col++) 
+        { 
+            //  Copying into temporary matrix only those element 
+            //  which are not in given row and column 
+            if (row != p && col != q) 
+            { 
+                temp[i][j++] = mat[row][col]; 
+  
+                // Row is filled, so increase row index and 
+                // reset col index 
+                if (j == n - 1) 
+                { 
+                    j = 0; 
+                    i++; 
+                } 
+            } 
+        } 
+    } 
+} 
+
+int determinantOfMatrix2(int mat[N][N], int n) 
+{ 
+    int D = 0; // Initialize result 
+  
+    //  Base case : if matrix contains single element 
+    if (n == 1) 
+        return mat[0][0]; 
+  
+    int temp[N][N]; // To store cofactors 
+  
+    int sign = 1;  // To store sign multiplier 
+  
+     // Iterate for each element of first row 
+    for (int f = 0; f < n; f++) 
+    { 
+        // Getting Cofactor of mat[0][f] 
+        getCofactor2(mat, temp, 0, f, n); 
+        D += sign * mat[0][f] * determinantOfMatrix2(temp, n - 1); 
+  
+        // terms are to be added with alternate sign 
+        sign = -sign; 
+    } 
+  
+    return D; 
+} 
+
+int determinantOfMatrix(int matrix[25][25], int size) 
+{ 
+    int determinant = 0;
+  
+    //  Base case(single element)
+    if (size == 1) 
+        return matrix[0][0]; 
+  
+    int cofactor_stores[25][25]; // To store cofactors 
+  
+    int sign = 1;  // To store sign multiplier 
+  
+     // Iterate for each element of first row 
+    for (int i = 0; i < size; i++) 
+    { 
+        // Getting Cofactor of mat[0][i] 
+        element_cofactor(matrix, cofactor_stores, 0, i, size); 
+        determinant += sign * matrix[0][i] * determinantOfMatrix(cofactor_stores, i - 1); 
+  
+        sign = -sign; 
+    } 
+  
+    return determinant; 
+} 
+
 float determinant(float a[25][25], float k)
 {
   float s = 1, det = 0, b[25][25];

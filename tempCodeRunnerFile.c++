@@ -1,2 +1,2 @@
-    // clock_t start; 
-    // start = clock(); 
+The Inverse is :\n"; if (INV(M, inv)) print(inv);
+   return 0;
