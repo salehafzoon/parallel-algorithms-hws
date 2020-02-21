@@ -2,7 +2,7 @@
 #include <time.h>
 
 using namespace std;
-#define N 11
+#define N 3
 
 template <typename Type>
 void get_cofactor(Type M[N][N], Type t[N][N], int p, int q, int n)
@@ -117,36 +117,41 @@ int main()
     // }
     
     
-    float matrix[N][N];
+    float matrix[N][N] ={ { 2, -1, -2 }, 
+					{ -4, 6, 3 }, 
+					{ -4, -2, 8 } }; 
+                    
     float inv[N][N];
 
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-            matrix[i][j] = generic_random(1,10);
-    }
+    // for (int i = 0; i < N; i++)
+    // {
+    //     for (int j = 0; j < N; j++)
+    //         matrix[i][j] = generic_random(1,10);
+    // }
 
     cout << "Input matrix is :\n";
     print_matrix(matrix);
 
-    clock_t time = clock();
+    cout<<"determinant\n"<<determinant(matrix,N)<<endl;
 
-    cout << "\nThe Inverse is :\n";
-    if (inverse(matrix, inv))
-        print_matrix(inv);
+    // clock_t time = clock();
 
-    time = clock() - time;
-    cout<<time<<endl;
+    // cout << "\nThe Inverse is :\n";
+    // if (inverse(matrix, inv))
+    //     print_matrix(inv);
 
-    int seconds = ((int)time) / CLOCKS_PER_SEC; // in seconds
-    int minutes = seconds / 60;
-    int hours = minutes / 60;
-    seconds = seconds % 60;
+    // time = clock() - time;
+    // cout<<time<<endl;
 
-    printf("\n\ntime of execution : %d hours / %d minutes / %d seconds\n",
-           int(hours), int(minutes % 60), int(seconds % 60));
+    // int seconds = ((int)time) / CLOCKS_PER_SEC; // in seconds
+    // int minutes = seconds / 60;
+    // int hours = minutes / 60;
+    // seconds = seconds % 60;
 
-    return 0;
+    // printf("\n\ntime of execution : %d hours / %d minutes / %d seconds\n",
+    //        int(hours), int(minutes % 60), int(seconds % 60));
+
+    // return 0;
 }
 
 //used linked for code :
