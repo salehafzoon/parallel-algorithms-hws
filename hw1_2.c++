@@ -152,3 +152,8 @@ int main()
 //used linked for code :
 // https://www.tutorialspoint.com/
 // cplusplus-program-to-find-inverse-of-a-graph-matrix
+
+
+// g++ -g -pg hw1_2.c++ -o out.exe 
+// out.exe main.c++
+// gprof out.exe gmon.out > profile-data.txt

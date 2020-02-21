@@ -3,12 +3,12 @@ Flat profile:
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
  time   seconds   seconds    calls   s/call   s/call  name    
- 73.15    236.05   236.05 2109842080     0.00     0.00  void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int)
- 26.85    322.69    86.64      145     0.60     2.23  float determinant<float>(float (*) [12], int)
-  0.00    322.69     0.00      144     0.00     0.00  int generic_random<int>(int, int)
-  0.00    322.69     0.00        2     0.00     0.00  void print_matrix<float>(float (*) [12])
-  0.00    322.69     0.00        1     0.00   320.46  void adjoint<float>(float (*) [12], float (*) [12])
-  0.00    322.69     0.00        1     0.00     2.23  bool inverse<float>(float (*) [12], float (*) [12])
+ 72.61     17.05    17.05 823059732     0.00     0.00  void get_cofactor<float>(float (*) [11], float (*) [11], int, int, int)
+ 27.39     23.48     6.43      122     0.05     0.19  float determinant<float>(float (*) [11], int)
+  0.00     23.48     0.00      121     0.00     0.00  int generic_random<int>(int, int)
+  0.00     23.48     0.00        2     0.00     0.00  void print_matrix<float>(float (*) [11])
+  0.00     23.48     0.00        1     0.00    23.29  void adjoint<float>(float (*) [11], float (*) [11])
+  0.00     23.48     0.00        1     0.00     0.19  bool inverse<float>(float (*) [11], float (*) [11])
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -46,44 +46,44 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 4 byte(s) for 0.00% of 322.69 seconds
+granularity: each sample hit covers 4 byte(s) for 0.04% of 23.48 seconds
 
 index % time    self  children    called     name
-                             2109841936             float determinant<float>(float (*) [12], int) [1]
-                0.60    1.63       1/145         bool inverse<float>(float (*) [12], float (*) [12]) [5]
-               86.04  234.42     144/145         void adjoint<float>(float (*) [12], float (*) [12]) [2]
-[1]    100.0   86.64  236.05     145+2109841936 float determinant<float>(float (*) [12], int) [1]
-              236.05    0.00 2109841936/2109842080     void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int) [4]
-                             2109841936             float determinant<float>(float (*) [12], int) [1]
+                             823059611             float determinant<float>(float (*) [11], int) [1]
+                0.05    0.14       1/122         bool inverse<float>(float (*) [11], float (*) [11]) [5]
+                6.38   16.91     121/122         void adjoint<float>(float (*) [11], float (*) [11]) [2]
+[1]    100.0    6.43   17.05     122+823059611 float determinant<float>(float (*) [11], int) [1]
+               17.05    0.00 823059611/823059732     void get_cofactor<float>(float (*) [11], float (*) [11], int, int, int) [4]
+                             823059611             float determinant<float>(float (*) [11], int) [1]
 -----------------------------------------------
-                0.00  320.46       1/1           _fu5___ZSt4cout [3]
-[2]     99.3    0.00  320.46       1         void adjoint<float>(float (*) [12], float (*) [12]) [2]
-               86.04  234.42     144/145         float determinant<float>(float (*) [12], int) [1]
-                0.00    0.00     144/2109842080     void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int) [4]
------------------------------------------------
-                                                 <spontaneous>
-[3]     99.3    0.00  320.46                 _fu5___ZSt4cout [3]
-                0.00  320.46       1/1           void adjoint<float>(float (*) [12], float (*) [12]) [2]
------------------------------------------------
-                0.00    0.00     144/2109842080     void adjoint<float>(float (*) [12], float (*) [12]) [2]
-              236.05    0.00 2109841936/2109842080     float determinant<float>(float (*) [12], int) [1]
-[4]     73.2  236.05    0.00 2109842080         void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int) [4]
------------------------------------------------
-                0.00    2.23       1/1           _fu1___ZSt4cout [6]
-[5]      0.7    0.00    2.23       1         bool inverse<float>(float (*) [12], float (*) [12]) [5]
-                0.60    1.63       1/145         float determinant<float>(float (*) [12], int) [1]
+                0.00   23.29       1/1           _fu5___ZSt4cout [3]
+[2]     99.2    0.00   23.29       1         void adjoint<float>(float (*) [11], float (*) [11]) [2]
+                6.38   16.91     121/122         float determinant<float>(float (*) [11], int) [1]
+                0.00    0.00     121/823059732     void get_cofactor<float>(float (*) [11], float (*) [11], int, int, int) [4]
 -----------------------------------------------
                                                  <spontaneous>
-[6]      0.7    0.00    2.23                 _fu1___ZSt4cout [6]
-                0.00    2.23       1/1           bool inverse<float>(float (*) [12], float (*) [12]) [5]
-                0.00    0.00       1/2           void print_matrix<float>(float (*) [12]) [9]
+[3]     99.2    0.00   23.29                 _fu5___ZSt4cout [3]
+                0.00   23.29       1/1           void adjoint<float>(float (*) [11], float (*) [11]) [2]
 -----------------------------------------------
-                0.00    0.00     144/144         main [102]
-[8]      0.0    0.00    0.00     144         int generic_random<int>(int, int) [8]
+                0.00    0.00     121/823059732     void adjoint<float>(float (*) [11], float (*) [11]) [2]
+               17.05    0.00 823059611/823059732     float determinant<float>(float (*) [11], int) [1]
+[4]     72.6   17.05    0.00 823059732         void get_cofactor<float>(float (*) [11], float (*) [11], int, int, int) [4]
+-----------------------------------------------
+                0.00    0.19       1/1           _fu1___ZSt4cout [6]
+[5]      0.8    0.00    0.19       1         bool inverse<float>(float (*) [11], float (*) [11]) [5]
+                0.05    0.14       1/122         float determinant<float>(float (*) [11], int) [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]      0.8    0.00    0.19                 _fu1___ZSt4cout [6]
+                0.00    0.19       1/1           bool inverse<float>(float (*) [11], float (*) [11]) [5]
+                0.00    0.00       1/2           void print_matrix<float>(float (*) [11]) [9]
+-----------------------------------------------
+                0.00    0.00     121/121         main [102]
+[8]      0.0    0.00    0.00     121         int generic_random<int>(int, int) [8]
 -----------------------------------------------
                 0.00    0.00       1/2           _fu0___ZSt4cout [81]
                 0.00    0.00       1/2           _fu1___ZSt4cout [6]
-[9]      0.0    0.00    0.00       2         void print_matrix<float>(float (*) [12]) [9]
+[9]      0.0    0.00    0.00       2         void print_matrix<float>(float (*) [11]) [9]
 -----------------------------------------------
 
  This table describes the call tree of the program, and was sorted by
@@ -176,5 +176,5 @@ notice and this notice are preserved.
 
 Index by function name
 
-   [1] float determinant<float>(float (*) [12], int) [9] void print_matrix<float>(float (*) [12]) [2] void adjoint<float>(float (*) [12], float (*) [12])
-   [4] void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int) [8] int generic_random<int>(int, int) [5] bool inverse<float>(float (*) [12], float (*) [12])
+   [1] float determinant<float>(float (*) [11], int) [9] void print_matrix<float>(float (*) [11]) [2] void adjoint<float>(float (*) [11], float (*) [11])
+   [4] void get_cofactor<float>(float (*) [11], float (*) [11], int, int, int) [8] int generic_random<int>(int, int) [5] bool inverse<float>(float (*) [11], float (*) [11])
