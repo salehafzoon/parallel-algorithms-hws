@@ -101,20 +101,29 @@ void print_matrix(Type A[N][N])
     }
 }
 template <class T>
-T generateRandomNumber(T startRange, T endRange)
+T generic_random(T startRange, T endRange)
 {
-    return startRange + T(rand()) / T(RAND_MAX) * (endRange - startRange);
+    return startRange + (T)rand()/((T)RAND_MAX/(T)(endRange-startRange));
 }
 
 int main()
-{
+{   
+    // double s = 1.433333;
+    // double e = 4.1;
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     double x = generateRandomNumber(s,e);
+    //     cout<<x<<endl;
+    // }
+    
+    
     float matrix[N][N];
     float inv[N][N];
 
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
-            matrix[i][j] = (float) rand()/100;
+            matrix[i][j] = generic_random(1,10);
     }
 
     cout << "Input matrix is :\n";
@@ -127,6 +136,8 @@ int main()
         print_matrix(inv);
 
     time = clock() - time;
+    cout<<time<<endl;
+
     int seconds = ((int)time) / CLOCKS_PER_SEC; // in seconds
     int minutes = seconds / 60;
     int hours = minutes / 60;

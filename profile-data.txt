@@ -1,0 +1,180 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 73.15    236.05   236.05 2109842080     0.00     0.00  void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int)
+ 26.85    322.69    86.64      145     0.60     2.23  float determinant<float>(float (*) [12], int)
+  0.00    322.69     0.00      144     0.00     0.00  int generic_random<int>(int, int)
+  0.00    322.69     0.00        2     0.00     0.00  void print_matrix<float>(float (*) [12])
+  0.00    322.69     0.00        1     0.00   320.46  void adjoint<float>(float (*) [12], float (*) [12])
+  0.00    322.69     0.00        1     0.00     2.23  bool inverse<float>(float (*) [12], float (*) [12])
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.00% of 322.69 seconds
+
+index % time    self  children    called     name
+                             2109841936             float determinant<float>(float (*) [12], int) [1]
+                0.60    1.63       1/145         bool inverse<float>(float (*) [12], float (*) [12]) [5]
+               86.04  234.42     144/145         void adjoint<float>(float (*) [12], float (*) [12]) [2]
+[1]    100.0   86.64  236.05     145+2109841936 float determinant<float>(float (*) [12], int) [1]
+              236.05    0.00 2109841936/2109842080     void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int) [4]
+                             2109841936             float determinant<float>(float (*) [12], int) [1]
+-----------------------------------------------
+                0.00  320.46       1/1           _fu5___ZSt4cout [3]
+[2]     99.3    0.00  320.46       1         void adjoint<float>(float (*) [12], float (*) [12]) [2]
+               86.04  234.42     144/145         float determinant<float>(float (*) [12], int) [1]
+                0.00    0.00     144/2109842080     void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int) [4]
+-----------------------------------------------
+                                                 <spontaneous>
+[3]     99.3    0.00  320.46                 _fu5___ZSt4cout [3]
+                0.00  320.46       1/1           void adjoint<float>(float (*) [12], float (*) [12]) [2]
+-----------------------------------------------
+                0.00    0.00     144/2109842080     void adjoint<float>(float (*) [12], float (*) [12]) [2]
+              236.05    0.00 2109841936/2109842080     float determinant<float>(float (*) [12], int) [1]
+[4]     73.2  236.05    0.00 2109842080         void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int) [4]
+-----------------------------------------------
+                0.00    2.23       1/1           _fu1___ZSt4cout [6]
+[5]      0.7    0.00    2.23       1         bool inverse<float>(float (*) [12], float (*) [12]) [5]
+                0.60    1.63       1/145         float determinant<float>(float (*) [12], int) [1]
+-----------------------------------------------
+                                                 <spontaneous>
+[6]      0.7    0.00    2.23                 _fu1___ZSt4cout [6]
+                0.00    2.23       1/1           bool inverse<float>(float (*) [12], float (*) [12]) [5]
+                0.00    0.00       1/2           void print_matrix<float>(float (*) [12]) [9]
+-----------------------------------------------
+                0.00    0.00     144/144         main [102]
+[8]      0.0    0.00    0.00     144         int generic_random<int>(int, int) [8]
+-----------------------------------------------
+                0.00    0.00       1/2           _fu0___ZSt4cout [81]
+                0.00    0.00       1/2           _fu1___ZSt4cout [6]
+[9]      0.0    0.00    0.00       2         void print_matrix<float>(float (*) [12]) [9]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2019 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+   [1] float determinant<float>(float (*) [12], int) [9] void print_matrix<float>(float (*) [12]) [2] void adjoint<float>(float (*) [12], float (*) [12])
+   [4] void get_cofactor<float>(float (*) [12], float (*) [12], int, int, int) [8] int generic_random<int>(int, int) [5] bool inverse<float>(float (*) [12], float (*) [12])
