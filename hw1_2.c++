@@ -2,7 +2,7 @@
 #include <time.h>
 
 using namespace std;
-#define N 12
+#define N 11
 
 template <typename Type>
 void get_cofactor(Type M[N][N], Type t[N][N], int p, int q, int n)
@@ -29,12 +29,12 @@ void get_cofactor(Type M[N][N], Type t[N][N], int p, int q, int n)
 }
 
 template <typename Type>
-int determinant(Type M[N][N], int n)
+float determinant(Type M[N][N], int n)
 {
-    int D = 0;
+    float D = 0;
     if (n == 1)
         return M[0][0];
-    int t[N][N]; //store cofactors
+    Type t[N][N]; //store cofactors
     int s = 1;   //store sign multiplier //
                  //To Iterate each element of first row
     for (int f = 0; f < n; f++)
@@ -56,22 +56,23 @@ void adjoint(Type M[N][N], Type adj[N][N])
         adj[0][0] = 1;
         return;
     }
-    int s = 1,
-        t[N][N];
+    int s = 1;
+    Type t[N][N];
+
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
         {
             //To get cofactor of M[i][j]
             get_cofactor(M, t, i, j, N);
-            s = ((i + j) % 2 == 0) ? 1 : -1;    //change sign acording to positive   
+            s = ((i + j) % 2 == 0) ? 1 : -1;           //change sign acording to positive
             adj[j][i] = (s) * (determinant(t, N - 1)); //Interchange rows and columns to get the transpose of the cofactor matrix
         }
     }
 }
 
 template <typename Type>
-bool inverse(Type M[N][N], float inv[N][N])
+bool inverse(Type M[N][N], Type inv[N][N])
 {
     int det = determinant(M, N);
     if (det == 0)
@@ -79,12 +80,12 @@ bool inverse(Type M[N][N], float inv[N][N])
         cout << "can't find its inverse";
         return false;
     }
-    int adj[N][N];
+    Type adj[N][N];
     adjoint(M, adj);
 
     for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++)
-            inv[i][j] = adj[i][j] / float(det);
+            inv[i][j] = adj[i][j] / det;
     return true;
 }
 
@@ -99,16 +100,21 @@ void print_matrix(Type A[N][N])
         cout << endl;
     }
 }
+template <class T>
+T generateRandomNumber(T startRange, T endRange)
+{
+    return startRange + T(rand()) / T(RAND_MAX) * (endRange - startRange);
+}
 
 int main()
 {
-    int matrix[N][N];
+    float matrix[N][N];
     float inv[N][N];
 
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
-            matrix[i][j] = rand() % 10;
+            matrix[i][j] = (float) rand()/100;
     }
 
     cout << "Input matrix is :\n";
