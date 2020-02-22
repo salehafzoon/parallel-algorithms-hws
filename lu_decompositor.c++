@@ -1,118 +1,135 @@
-// CPP Program to decompose a matrix into 
-// lower and upper traingular matrix 
+// CPP Program to decompose a matrix into
+// lower and upper traingular matrix
 #include <iostream>
-#include <math.h> 
-using namespace std; 
+#include <math.h>
 
-const int MAX = 20; 
+using namespace std;
+#define N 3
 
-void init_matirx(int mat[][20]){
-    for(int i = 0;i<20;i++){
-        for(int j = 0;j<20;j++){
-            mat[i][j] = 0;
-        }
-    }
+// const int MAX = 20;
+
+template <typename Type>
+void init_matirx(Type mat[][N])
+{
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			mat[i][j] = 0;
+		}
+	}
 }
-void luDecomposition(int mat[][MAX],int lower[20][20],int upper[20][20], int n) 
-{ 
-	
-	// Decomposing matrix into Upper and Lower 
-	// triangular matrix 
-	for (int i = 0; i < n; i++) { 
 
-		// Upper Triangular 
-		for (int k = i; k < n; k++) { 
+template <typename Type>
+void luDecomposition(Type mat[][N], Type lower[][N], Type upper[][N])
+{
+	int exchange = 0;
+	// Decomposing matrix into Upper and Lower
+	// triangular matrix
+	for (int i = 0; i < N; i++)
+	{
 
-			// Summation of L(i, j) * U(j, k) 
-			int sum = 0; 
-			for (int j = 0; j < i; j++) 
-				sum += (lower[i][j] * upper[j][k]); 
+		// Upper Triangular
+		for (int k = i; k < N; k++)
+		{
 
-			// Evaluating U(i, k) 
-			upper[i][k] = mat[i][k] - sum; 
-		} 
+			// Summation of L(i, j) * U(j, k)
+			int sum = 0;
+			for (int j = 0; j < i; j++)
+				sum += (lower[i][j] * upper[j][k]);
 
-		// Lower Triangular 
-		for (int k = i; k < n; k++) { 
-			if (i == k) 
-				lower[i][i] = 1; // Diagonal as 1 
-			else { 
+			// Evaluating U(i, k)
+			upper[i][k] = mat[i][k] - sum;
+		}
 
-				// Summation of L(k, j) * U(j, i) 
-				int sum = 0; 
-				for (int j = 0; j < i; j++) 
-					sum += (lower[k][j] * upper[j][i]); 
+		// Lower Triangular
+		for (int k = i; k < N; k++)
+		{
+			if (i == k)
+				lower[i][i] = 1; // Diagonal as 1
+			else
+			{
 
-				// Evaluating L(k, i) 
-				lower[k][i] = (mat[k][i] - sum) / upper[i][i]; 
-			} 
-		} 
-	} 
+				// Summation of L(k, j) * U(j, i)
+				int sum = 0;
+				for (int j = 0; j < i; j++)
+					sum += (lower[k][j] * upper[j][i]);
 
-	// Displaying the result : 
-	for (int i = 0; i < n; i++) { 
-		// Lower 
-		for (int j = 0; j < n; j++) 
-			cout <<lower[i][j] << "\t"; 
-		cout << "\t"; 
+				// Evaluating L(k, i)
+				lower[k][i] = (mat[k][i] - sum) / upper[i][i];
+			}
+		}
+	}
 
-		// Upper 
-		for (int j = 0; j < n; j++) 
-			cout << upper[i][j] << "\t"; 
-		cout << endl; 
-	} 
-} 
+	// Displaying the result :
+	for (int i = 0; i < N; i++)
+	{
+		// Lower
+		for (int j = 0; j < N; j++)
+			cout << lower[i][j] << "\t";
+		cout << "\t";
 
+		// Upper
+		for (int j = 0; j < N; j++)
+			cout << upper[i][j] << "\t";
+		cout << endl;
+	}
+}
 
 // returns an NxN identity matrix
-void identity(int id[][20], int n)
+template <typename Type>
+void identity(Type id[N][N])
 {
 
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            id[i][j] = 0;
-        }
-        id[i][i] = 1;
-    }
+	for (int i = 0; i < N; i++)
+	{
+		for (int j = 0; j < N; j++)
+		{
+			id[i][j] = (Type)0;
+		}
+		id[i][i] = (Type)1;
+	}
 }
 
-int det(int mat[][MAX],int lower[][MAX],int upper[][MAX], int p[][MAX],int n)
+template <typename Type>
+int det(Type mat[][N], Type lower[][N], Type upper[][N], Type p[][N])
 { //returns the determinant of square matrix A
 
-    luDecomposition(mat, lower, upper, n);
-    int D = 1;
+	luDecomposition(mat, lower, upper);
+	int D = 1;
 
-    // calculate determinant of u
-    int u_det = 1;
-    for (int i =0;i<n;i++){
-        u_det *= upper[i][i];
-    }
+	// calculate determinant of u
+	int u_det = 1;
+	for (int i = 0; i < N; i++)
+	{
+		u_det *= upper[i][i];
+	}
 
-    // calculate determinant as det(p) * det(l)=1 * det(u)
-    D = D * pow(-1,n) * 1 * u_det;
+	// calculate determinant as det(p) * det(l)=1 * det(u)
+	D = D * pow(-1, N + 1) * 1 * u_det;
 
-    cout<<"determinant:"<<D<<endl;
+	cout << "determinant:" << D << endl;
 
-    return D;
+	return D;
 }
 
+// Driver code
+int main()
+{
+	// int mat[][N] = { { 2, -1, -2 },
+	// 				{ -4, 6, 3 },
+	// 				{ -4, -2, 8 } };
 
-// Driver code 
-int main() 
-{ 
-	int mat[][MAX] = { { 2, -1, -2 }, 
-					{ -4, 6, 3 }, 
-					{ -4, -2, 8 } }; 
+	int mat[][N] = {{1,12, 	3},
+					{5, -6, 4},
+					{8, 1, -7}};
 
-    int lower[20][20], upper[20][20], p[20][20]; 
+	int lower[N][N], upper[N][N], p[N][N];
 	init_matirx(lower);
-    init_matirx(upper);
-    identity(p,3);
-	
-    // luDecomposition(mat, 3); 
-    det(mat,lower,upper,p,3);
+	init_matirx(upper);
+	identity(p);
 
-	return 0; 
-} 
+	det(mat, lower, upper, p);
+
+	return 0;
+}

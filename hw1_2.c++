@@ -35,8 +35,8 @@ float determinant(Type M[N][N], int n)
     if (n == 1)
         return M[0][0];
     Type t[N][N]; //store cofactors
-    int s = 1;   //store sign multiplier //
-                 //To Iterate each element of first row
+    int s = 1;    //store sign multiplier //
+                  //To Iterate each element of first row
     for (int f = 0; f < n; f++)
     {
         //For Getting Cofactor of M[0][f] do
@@ -103,11 +103,11 @@ void print_matrix(Type A[N][N])
 template <class T>
 T generic_random(T startRange, T endRange)
 {
-    return startRange + (T)rand()/((T)RAND_MAX/(T)(endRange-startRange));
+    return startRange + (T)rand() / ((T)RAND_MAX / (T)(endRange - startRange));
 }
 
 int main()
-{   
+{
     // double s = 1.433333;
     // double e = 4.1;
     // for (int i = 0; i < 10; i++)
@@ -115,12 +115,15 @@ int main()
     //     double x = generateRandomNumber(s,e);
     //     cout<<x<<endl;
     // }
-    
-    
-    float matrix[N][N] ={ { 2, -1, -2 }, 
-					{ -4, 6, 3 }, 
-					{ -4, -2, 8 } }; 
-                    
+
+    // float matrix[N][N] ={ { 2, -1, -2 },
+    // 				{ -4, 6, 3 },
+    // 				{ -4, -2, 8 } };
+
+    int matrix[][N] = {{1, 12, 3},
+                    {5, -6, 4},
+                    {8, 1, -7}};
+
     float inv[N][N];
 
     // for (int i = 0; i < N; i++)
@@ -132,7 +135,8 @@ int main()
     cout << "Input matrix is :\n";
     print_matrix(matrix);
 
-    cout<<"determinant\n"<<determinant(matrix,N)<<endl;
+    cout << "determinant\n"
+         << determinant(matrix, N) << endl;
 
     // clock_t time = clock();
 
@@ -158,7 +162,6 @@ int main()
 // https://www.tutorialspoint.com/
 // cplusplus-program-to-find-inverse-of-a-graph-matrix
 
-
-// g++ -g -pg hw1_2.c++ -o out.exe 
+// g++ -g -pg hw1_2.c++ -o out.exe
 // out.exe main.c++
 // gprof out.exe gmon.out > profile-data.txt
