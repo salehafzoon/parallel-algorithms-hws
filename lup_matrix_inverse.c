@@ -122,24 +122,27 @@ int main()
 
   initial_matix(A, A1);
 
-  print_matrix(A);
+  // print_matrix(A);
 
   /* Performing LUP-decomposition of the matrix 'A'*/
   if (LUPdecompose(N + 1, A, P) < 0)
     return -1;
 
-  permutation_print(P);
+  // permutation_print(P);
 
-  print_LU_matrix(A);
+  // print_LU_matrix(A);
 
   /* Inverting based on the LUP ,The inverse is stored in 'A' itself. */
   if (LUPinverse(N + 1, P, A, B, X, Y) < 0)
     return -1;
 
-  print_inverting_result(A);
+  // print_inverting_result(A);
 
   /* check correctness of result by calculate A.A1 ,result must be I */
-  check_inverse_correction(A,A1,I);
+
+  // check_inverse_correction(A,A1,I);
+
+  printf("\n\nsuccessfully finished\n");
 
   return 0;
 }
@@ -201,7 +204,7 @@ static int LUPdecompose(int size, Type A[MAX][MAX], int P[MAX])
 }
 
 /* inverse of the LUP decomposed matrix 'LU' and pivot 'P'.
- * The inverse is returned through the matrix 'LU'.
+ * The inverse is returned as 'LU'.
  * 'B', X', and 'Y' are used as temporary spaces. */
 static int LUPinverse(int size, int P[MAX], Type LU[MAX][MAX],
                       Type B[MAX][MAX], Type X[MAX], Type Y[MAX])
