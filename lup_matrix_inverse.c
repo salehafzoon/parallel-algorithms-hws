@@ -11,7 +11,7 @@
 
 typedef float Type;
 
-#define N 200 //Size of square matrix 'A'.
+#define N 500 //Size of square matrix 'A'.
 #define MAX N+1
 
 static int LUPdecompose(int size, Type A[MAX][MAX], int P[MAX]);
