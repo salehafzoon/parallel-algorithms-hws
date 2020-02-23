@@ -9,10 +9,10 @@
 /* The following header file contains a 128 bit float data type '__float128'*/
 //# include <quadmath.h>
 
-typedef double Type;
+typedef float Type;
 
-#define N 3 //Size of square matrix 'A'.
-#define MAX 3
+#define N 200 //Size of square matrix 'A'.
+#define MAX N+1
 
 static int LUPdecompose(int size, Type A[MAX][MAX], int P[MAX]);
 
@@ -31,10 +31,14 @@ void permutation_print(int P[N + 1])
 }
 void print_system_data_type_info()
 {
+  
   printf("On this machine, size (in bytes) and precision (in number of decimal digits)"
-         " of\n\tfloat: %ld and %d,\n\tdouble: %ld and %d,",
+         " of\n\tfloat: %ld and %d,\n\tdouble: %d and %d,",
          sizeof(float), FLT_DIG,
          sizeof(double), DBL_DIG);
+
+  printf("\n\nmatrix size is : %d",N);
+
 }
 
 void initial_matix(Type A[N + 1][N + 1], Type A1[N + 1][N + 1])
@@ -101,9 +105,8 @@ void check_inverse_correction(Type A[N + 1][N + 1], Type A1[N + 1][N + 1],
 
 int main()
 {
-  int i, j, k;
-
-  Type A[N + 1][N + 1], A1[N + 1][N + 1], I[N + 1][N + 1];
+  
+  Type A[N + 1][N + 1], A1[N + 1][N + 1];
 
   //permutation matrix
   int P[N + 1];
@@ -112,10 +115,10 @@ int main()
 
   print_system_data_type_info();
 
-#ifdef QUADMATH_H
-  printf("\n\t__float128: %ld and %d,", sizeof(__float128), FLT128_DIG);
-#endif
-  printf(" respectively.");
+// #ifdef QUADMATH_H
+//   printf("\n\t__float128: %ld and %d,", sizeof(__float128), FLT128_DIG);
+// #endif
+//   printf(" respectively.");
 
   /* Defining the to-be-inverted matrix, A. A1 would be used later to test the inverted
  * matrix. */
