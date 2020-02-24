@@ -5,6 +5,7 @@
         "type_traits": "c",
         "xstring": "c",
         "xutility": "c",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "math.h": "c"
     }
 }

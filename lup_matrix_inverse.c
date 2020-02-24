@@ -10,7 +10,7 @@
 /* The following header file contains a 128 bit float data type '__float128'*/
 //# include <quadmath.h>
 
-typedef float Type;
+typedef double Type;
 
 #define N 500 //Size of square matrix 'A'.
 #define MAX N+1
