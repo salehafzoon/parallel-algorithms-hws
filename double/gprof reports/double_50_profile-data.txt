@@ -1,13 +1,12 @@
 Flat profile:
 
 Each sample counts as 0.01 seconds.
+ no time accumulated
+
   %   cumulative   self              self     total           
  time   seconds   seconds    calls  Ts/call  Ts/call  name    
- 71.74      0.33     0.33                             LUPinverse
- 26.09      0.45     0.12                             LUPdecompose
-  2.17      0.46     0.01                             __chkstk_ms
-  0.00      0.46     0.00        1     0.00     0.00  initial_matix
-  0.00      0.46     0.00        1     0.00     0.00  print_system_data_type_info
+  0.00      0.00     0.00        1     0.00     0.00  initial_matix
+  0.00      0.00     0.00        1     0.00     0.00  print_system_data_type_info
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -45,28 +44,19 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 4 byte(s) for 2.17% of 0.46 seconds
+granularity: each sample hit covers 4 byte(s) no time propagated
 
 index % time    self  children    called     name
-                                                 <spontaneous>
-[1]     71.7    0.33    0.00                 LUPinverse [1]
------------------------------------------------
-                                                 <spontaneous>
-[2]     26.1    0.12    0.00                 LUPdecompose [2]
------------------------------------------------
-                                                 <spontaneous>
-[3]      2.2    0.01    0.00                 __chkstk_ms [3]
+                0.00    0.00       1/1           main [82]
+[2]      0.0    0.00    0.00       1         initial_matix [2]
 -----------------------------------------------
                 0.00    0.00       1/1           main [82]
-[5]      0.0    0.00    0.00       1         initial_matix [5]
------------------------------------------------
-                0.00    0.00       1/1           main [82]
-[6]      0.0    0.00    0.00       1         print_system_data_type_info [6]
+[3]      0.0    0.00    0.00       1         print_system_data_type_info [3]
 -----------------------------------------------
                                    2             main [82]
 [82]     0.0    0.00    0.00       0+2       main [82]
-                0.00    0.00       1/1           print_system_data_type_info [6]
-                0.00    0.00       1/1           initial_matix [5]
+                0.00    0.00       1/1           print_system_data_type_info [3]
+                0.00    0.00       1/1           initial_matix [2]
                                    2             main [82]
 -----------------------------------------------
 
@@ -160,5 +150,4 @@ notice and this notice are preserved.
 
 Index by function name
 
-   [2] LUPdecompose            [3] __chkstk_ms             [6] print_system_data_type_info
-   [1] LUPinverse              [5] initial_matix
+   [2] initial_matix           [3] print_system_data_type_info

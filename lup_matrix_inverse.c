@@ -10,7 +10,7 @@
 /* The following header file contains a 128 bit float data type '__float128'*/
 //# include <quadmath.h>
 
-typedef double Type;
+typedef float Type;
 
 #define N 1000 //Size of square matrix 'A'.
 #define MAX N+1
@@ -129,16 +129,20 @@ int main()
   // print_matrix(A);
 
   /* Performing LUP-decomposition of the matrix 'A'*/
-  if (LUPdecompose(N + 1, A, P) < 0)
+  if (LUPdecompose(N + 1, A, P) < 0){
+    printf("\nLUPdecompose faild");
     return -1;
+  }
 
   // permutation_print(P);
 
   // print_LU_matrix(A);
 
   /* Inverting based on the LUP ,The inverse is stored in 'A' itself. */
-  if (LUPinverse(N + 1, P, A, B, X, Y) < 0)
+  if (LUPinverse(N + 1, P, A, B, X, Y) < 0){
+    printf("\nLUPinverse faild");
     return -1;
+  }
 
   // print_inverting_result(A);
 
@@ -204,6 +208,7 @@ static int LUPdecompose(int size, Type A[MAX][MAX], int P[MAX])
   } //Now, 'A' contains the L (without the diagonal elements, which are all 1)
   //and the U.
 
+  printf("\nLUPdecompose successfully done");
   return 0;
 }
 
@@ -257,5 +262,6 @@ static int LUPinverse(int size, int P[MAX], Type LU[MAX][MAX],
     for (j = 1; j < size; j++)
       LU[i][j] = B[j][i];
 
+  printf("\nLUPinverse successfully done");
   return 0;
 }
