@@ -13,7 +13,6 @@
 typedef float Type;
 
 #define N 1000 //Size of square matrix 'A'.
-#define MAX N + 1
 
 static int LUPdecompose(int size, Type **A, int *P);
 
@@ -137,7 +136,7 @@ int main()
   X = (Type *)malloc((N + 1) * sizeof(Type));
   Y = (Type *)malloc((N + 1) * sizeof(Type));
 
-  // print_system_data_type_info();
+  printf("\n\nmatrix size is : %d\n", N);
 
   /* Defining the to-be-inverted matrix, A. A1 would be used later to test the inverted
  * matrix. */
@@ -174,6 +173,8 @@ int main()
 
   free(A);
   free(A1);
+  free(I);
+  free(P);
   free(B);
   free(X);
   free(Y);
