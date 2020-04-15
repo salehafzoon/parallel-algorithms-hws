@@ -12,7 +12,7 @@
 
 typedef float Type;
 
-#define N 1000 //Size of square matrix 'A'.
+#define N 100 //Size of square matrix 'A'.
 
 static int LUPdecompose(int size, Type **A, int *P);
 
