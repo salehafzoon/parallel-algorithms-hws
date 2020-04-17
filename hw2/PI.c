@@ -6,7 +6,7 @@
 
 #define MaxItems 5 
 #define BufferSize 1 // Size of the buffer
-#define n 1000
+#define n 1000000
 
 sem_t empty;
 sem_t full;
@@ -23,31 +23,31 @@ void serial_pi_calculate(){
         factor = -factor; 
     } 
     pi = 4 * sum; 
-    printf("pi = %f\n", pi); 
+    // printf("sum = %f\n",sum);
+    printf("pi (serial) = %f\n", pi); 
 }
 
 typedef struct argument{
     int id;
     int size;
-    double sum;
+    double *sum;
 }argument;
 
 void *paralel_pi_calculate(void *arg)
 {   
     argument arg_ = *(argument*)arg;
     int id = arg_.id, size = arg_.size;
-    double *sum = arg_.sum;
     int start = id * size;
     int end = start + size;
 
-    printf("s:%d e:%d\n",start,end);
+    // printf("s:%d e:%d\n",start,end);
 
     double factor = 1;
     for(int i = start; i < end; i++) {
-        sum += factor/(2*i+1); 
+        *arg_.sum += factor/(2*i+1); 
         factor = -factor; 
     }
-    printf("sum:%f\n\n",sum);
+    // printf("sum:%f\n\n",*arg_.sum);
 
     pthread_exit(NULL);
 }
@@ -55,12 +55,14 @@ void *paralel_pi_calculate(void *arg)
 int main(int argc , char* argv[])
 {   
 
-    // serial_pi_calculate();
+    serial_pi_calculate();
     int i;
     int threads_num = atoi(argv[1]);
     
-    double *sums = (double *)malloc(sizeof(double) * threads_num);
-
+    double **sums = (double **)malloc(sizeof(double*) * threads_num);
+    for (i=0;i<threads_num;i++){
+        sums[i] = (double *)malloc(sizeof(double));
+    }
     pthread_t threads[threads_num];
     argument arguments[threads_num];
 
@@ -74,10 +76,11 @@ int main(int argc , char* argv[])
     int status;
     for(i =0;i<threads_num;i++){
         pthread_join(threads[i],NULL);
-        total =+sums[i];
+        // printf("\ts:%f", *sums[i]);
+        total += *sums[i];
     }
-    int pi = total*4;
-    printf("total=%f\n",total);
+    double pi = total*4;
+
     printf("pi = %f\n", pi); 
     return 0;
     
