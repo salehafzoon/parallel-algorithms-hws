@@ -4,16 +4,7 @@
 #include <stdio.h>
 #include <unistd.h> 
 
-#define MaxItems 5 
-#define BufferSize 1 // Size of the buffer
 #define n 1000000
-
-sem_t empty;
-sem_t full;
-int in = 0;
-int out = 0;
-int buffer[BufferSize];
-pthread_mutex_t mutex;
 
 void serial_pi_calculate(){
     double factor = 1, sum = 0, pi;
@@ -81,7 +72,12 @@ int main(int argc , char* argv[])
     }
     double pi = total*4;
 
-    printf("pi = %f\n", pi); 
+    for (i=0;i<threads_num;i++){
+        free(sums[i]);
+    }
+    free(sums);
+
+    printf("pi (parallel) = %f\n", pi); 
     return 0;
     
 }
