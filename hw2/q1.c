@@ -21,6 +21,7 @@ void *producer(void *pno)
         pthread_mutex_unlock(&mutex);
         sem_post(&full);
     }
+    pthread_exit(NULL);
 }
 void *consumer(void *cno)
 {   
@@ -31,6 +32,7 @@ void *consumer(void *cno)
         pthread_mutex_unlock(&mutex);
         sem_post(&empty);
     }
+    pthread_exit(NULL);
 }
 
 int main()

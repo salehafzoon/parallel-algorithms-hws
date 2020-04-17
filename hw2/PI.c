@@ -6,7 +6,7 @@
 
 #define MaxItems 5 
 #define BufferSize 1 // Size of the buffer
-#define n 1000000
+#define n 1000
 
 sem_t empty;
 sem_t full;
@@ -15,58 +15,70 @@ int out = 0;
 int buffer[BufferSize];
 pthread_mutex_t mutex;
 
-void *producer(void *pno)
-{   
-    int item;
-    for(int i = 0; i < MaxItems; i++) {
-        sem_wait(&empty);
-        pthread_mutex_lock(&mutex);
-        sleep(1); 
-        printf("hello");
-        pthread_mutex_unlock(&mutex);
-        sem_post(&full);
-    }
-}
-void *consumer(void *cno)
-{   
-    for(int i = 0; i < MaxItems; i++) {
-        sem_wait(&full);
-        pthread_mutex_lock(&mutex);
-        printf(" world\n");
-        pthread_mutex_unlock(&mutex);
-        sem_post(&empty);
-    }
+void serial_pi_calculate(){
+    double factor = 1, sum = 0, pi;
+    int i;
+    for(i = 0; i < n; i++){ 
+        sum += factor/(2*i+1); 
+        factor = -factor; 
+    } 
+    pi = 4 * sum; 
+    printf("pi = %f\n", pi); 
 }
 
-typedef struct arg{
-    int thread_num;
-}arg;
+typedef struct argument{
+    int id;
+    int size;
+    double sum;
+}argument;
 
-int main()
+void *paralel_pi_calculate(void *arg)
+{   
+    argument arg_ = *(argument*)arg;
+    int id = arg_.id, size = arg_.size;
+    double *sum = arg_.sum;
+    int start = id * size;
+    int end = start + size;
+
+    printf("s:%d e:%d\n",start,end);
+
+    double factor = 1;
+    for(int i = start; i < end; i++) {
+        sum += factor/(2*i+1); 
+        factor = -factor; 
+    }
+    printf("sum:%f\n\n",sum);
+
+    pthread_exit(NULL);
+}
+
+int main(int argc , char* argv[])
 {   
 
-    pthread_t thrd1,thrd2;
-
-    pthread_mutex_init(&mutex, NULL);
-    sem_init(&empty,0,BufferSize);
-    sem_init(&full,0,0);
-
-    int a[2] = {1,2}; //Just used for numbering the producer and consumer
-
-    arg args[2];
-    args[0].thread_num = 1;
-    args[1].thread_num = 2;
-
-    pthread_create(&thrd1, NULL, producer, (void*)&args[0]);
-    pthread_create(&thrd2, NULL, consumer, (void*)&args[1]);
-
-    pthread_join(thrd1, NULL);
-    pthread_join(thrd2, NULL);
+    // serial_pi_calculate();
+    int i;
+    int threads_num = atoi(argv[1]);
     
-    pthread_mutex_destroy(&mutex);
-    sem_destroy(&empty);
-    sem_destroy(&full);
+    double *sums = (double *)malloc(sizeof(double) * threads_num);
 
+    pthread_t threads[threads_num];
+    argument arguments[threads_num];
+
+    for(i =0;i<threads_num;i++){
+        arguments[i].id = i;
+        arguments[i].size = n/threads_num;
+        arguments[i].sum = sums[i];
+        pthread_create(&threads[i], NULL, paralel_pi_calculate, (void*)&arguments[i]);
+    }
+    double total =0;
+    int status;
+    for(i =0;i<threads_num;i++){
+        pthread_join(threads[i],NULL);
+        total =+sums[i];
+    }
+    int pi = total*4;
+    printf("total=%f\n",total);
+    printf("pi = %f\n", pi); 
     return 0;
     
 }
