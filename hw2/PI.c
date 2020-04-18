@@ -4,7 +4,7 @@
 #include <unistd.h> 
 #include<time.h>
 
-#define n 1000000
+#define n 10000000
 
 void serial_pi_calculate(){
     double factor = 1, sum = 0, pi;
@@ -15,7 +15,7 @@ void serial_pi_calculate(){
     } 
     pi = 4 * sum; 
     // printf("sum = %f\n",sum);
-    printf("pi (serial) = %f\n", pi); 
+    printf("pi (serial) = %f\t\t", pi); 
 }
 
 typedef struct argument{
@@ -52,13 +52,15 @@ int main(int argc , char* argv[])
     double total =0 , pi;
     clock_t ser_msec , par_msec;
     
+    printf("\nn = %d , threads = %d \n",n,threads_num);
+
     ser_msec = clock();
     
     serial_pi_calculate();
     
     ser_msec = (double)(clock() - ser_msec) * 1000000 /CLOCKS_PER_SEC;
     
-    printf("%d micro seconds\n",ser_msec);
+    printf("%d microsecond\n",ser_msec);
 
     double **sums = (double **)malloc(sizeof(double*) * threads_num);
     for (i=0;i<threads_num;i++){
@@ -82,10 +84,10 @@ int main(int argc , char* argv[])
     }
     pi = total*4;
 
-    printf("pi (parallel) = %f\n", pi); 
+    printf("pi (parallel) = %f\t", pi); 
 
     par_msec = (double)(clock() - par_msec) * 1000000 /CLOCKS_PER_SEC;
-    printf("%d micro seconds\n",par_msec);
+    printf("%d microsecond\n",par_msec);
 
     printf("speed up : %.2f\n", ((double)ser_msec/par_msec));
     
