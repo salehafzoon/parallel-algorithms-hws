@@ -1,8 +1,8 @@
 #include <pthread.h>
-#include <semaphore.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h> 
+#include<time.h>
 
 #define n 1000000
 
@@ -41,15 +41,25 @@ void *paralel_pi_calculate(void *arg)
     // printf("sum:%f\n\n",*arg_.sum);
 
     pthread_exit(NULL);
+    return 0;
 }
 
 int main(int argc , char* argv[])
 {   
 
-    serial_pi_calculate();
-    int i;
+    int i , status , t_serial = 0 , t_parallel = 0;
     int threads_num = atoi(argv[1]);
+    double total =0 , pi;
+    clock_t ser_msec , par_msec;
     
+    ser_msec = clock();
+    
+    serial_pi_calculate();
+    
+    ser_msec = (double)(clock() - ser_msec) * 1000000 /CLOCKS_PER_SEC;
+    
+    printf("%d micro seconds\n",ser_msec);
+
     double **sums = (double **)malloc(sizeof(double*) * threads_num);
     for (i=0;i<threads_num;i++){
         sums[i] = (double *)malloc(sizeof(double));
@@ -57,27 +67,34 @@ int main(int argc , char* argv[])
     pthread_t threads[threads_num];
     argument arguments[threads_num];
 
+    par_msec = clock();
+    
     for(i =0;i<threads_num;i++){
         arguments[i].id = i;
         arguments[i].size = n/threads_num;
         arguments[i].sum = sums[i];
         pthread_create(&threads[i], NULL, paralel_pi_calculate, (void*)&arguments[i]);
     }
-    double total =0;
-    int status;
     for(i =0;i<threads_num;i++){
         pthread_join(threads[i],NULL);
         // printf("\ts:%f", *sums[i]);
         total += *sums[i];
     }
-    double pi = total*4;
+    pi = total*4;
+
+    printf("pi (parallel) = %f\n", pi); 
+
+    par_msec = (double)(clock() - par_msec) * 1000000 /CLOCKS_PER_SEC;
+    printf("%d micro seconds\n",par_msec);
+
+    printf("speed up : %.2f\n", ((double)ser_msec/par_msec));
+    
 
     for (i=0;i<threads_num;i++){
         free(sums[i]);
     }
     free(sums);
 
-    printf("pi (parallel) = %f\n", pi); 
     return 0;
     
 }
