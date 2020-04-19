@@ -4,7 +4,8 @@
 #include <unistd.h> 
 #include<time.h>
 
-#define n 10000000
+#define n 100000000
+int opt = 0;
 
 void serial_pi_calculate(){
     double factor = 1, sum = 0, pi;
@@ -34,12 +35,26 @@ void *paralel_pi_calculate(void *arg)
     // printf("s:%d e:%d\n",start,end);
 
     double factor = 1;
-    for(int i = start; i < end; i++) {
-        *arg_.sum += factor/(2*i+1); 
-        factor = -factor; 
+    
+    if(opt == 1)
+        for(int i = start; i < end;) {
+            *arg_.sum += factor/(2*i+1); 
+            factor = -factor; 
+            
+            *arg_.sum += factor/(2*(i+1)+1); 
+            factor = -factor; 
+            
+            i+=2;
+        }
+        // printf("sum:%f\n\n",*arg_.sum);
+    else
+    {
+     for(int i = start; i < end; i++) {
+            *arg_.sum += factor/(2*i+1); 
+            factor = -factor; 
+        }
+        // printf("sum:%f\n\n",*arg_.sum);   
     }
-    // printf("sum:%f\n\n",*arg_.sum);
-
     pthread_exit(NULL);
     return 0;
 }
