@@ -45,7 +45,12 @@ void *thread_pi_calculate(void *arg)
 
     // printf("tid:%d, s:%d , e:%d\n",arg_.tid,start,end);
     
-    double factor = 1;
+    double factor;
+    if(arg_.threads_num %2==0)
+        factor = 1;
+    else        
+        factor = pow(-1,id);
+    
     *arg_.sum = 0;
 
     for(int i = start ; i < end ; i++) { 
@@ -139,7 +144,6 @@ int main(int argc , char* argv[])
         avgValue/=(double)runs;
         avgTime/=(double)runs;
         
-        // printf("\n---------\nresults of %d time runs\n",runs);
         printf("avg pi = %f \n",avgValue);
         // printf("avg Time = %f \n",avgTime);
         printf("avg speed up = %f \n--------\n", ((double)ser_msec/avgTime));

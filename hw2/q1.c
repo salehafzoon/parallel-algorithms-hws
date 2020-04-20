@@ -36,8 +36,10 @@ void *consumer(void *cno)
 }
 
 void *serial_helloworld(){
+    printf("--------serial--------\n");
     for (int i = 0;i<5;i++)
-        printf("hello world\n");
+        printf("hello world\n");    
+    
 }
 
 int main(int argc , char* argv[])
@@ -61,6 +63,8 @@ int main(int argc , char* argv[])
 
     par_msec = clock();
     
+    printf("--------parallel--------\n");
+
     pthread_create(&thrd1, NULL, producer, NULL);
     pthread_create(&thrd2, NULL, consumer, NULL);
 
