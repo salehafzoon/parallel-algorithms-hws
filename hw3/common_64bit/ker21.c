@@ -6,6 +6,7 @@
 #include <omp.h>
 
 #define n 101
+#define count 20
 #define DEBUG 0
 
 struct timeval start, end;
@@ -59,8 +60,7 @@ double serial_calculate()
             }
         }
     
-    ser_msec = (double)(clock() - ser_msec) * 1000000 /CLOCKS_PER_SEC; 
-    printf("\n serial time: %d microsecond\n",ser_msec);
+    ser_msec = (clock() - ser_msec) * 1000000 /CLOCKS_PER_SEC; 
     
     return ser_msec;
 }
@@ -88,6 +88,7 @@ double paralel_calculate()
     
     // #pragma omp parallel for private(i,j,k) collapse(2)
     #pragma omp parallel shared(px,vy,cx) private(k,i,j)
+    #pragma omp parallel
     {
         #pragma omp for
         for (k = 0; k < 25; k++)
@@ -107,9 +108,7 @@ double paralel_calculate()
             }
     }
 
-    par_msec = (double)(clock() - par_msec) * 1000000 /CLOCKS_PER_SEC; 
-    
-    printf("\n paralel time: %d microsecond\n",par_msec);
+    par_msec = (clock() - par_msec) * 1000000 /CLOCKS_PER_SEC; 
     
     if (DEBUG)
         print_array(px);
@@ -121,13 +120,15 @@ double paralel_calculate()
 int main(int argc, char *argv[])
 {
 
-    double ser_msec = 0, par_msec = 0;
+    double avg_ser_msec = 0, avg_par_msec = 0;
 
-    ser_msec = serial_calculate();
-	// printf("\n serial time: %d microsecond\n",ser_msec);
+    for (int i = 0; i < count; i++)
+    {
+        avg_ser_msec += serial_calculate();
+        avg_par_msec += paralel_calculate();
+    }
+	printf("average serial time: %.3f microsecond\n",avg_ser_msec/count);
+    printf("average paralel time: %.3f microsecond\n",avg_par_msec/count);
     
-    par_msec = paralel_calculate();
-    // printf("\n paralel time: %d microsecond\n",par_msec);
-    	
     return 0;
 }
