@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include <time.h>
+#include <time.h> 
 #include "cpuidh.h"
 #include <omp.h>
 
@@ -1416,54 +1416,54 @@ void kernels()
 
     do
     {
-        gettimeofday(&start, NULL); 
+        // gettimeofday(&start, NULL); 
 
-        // for (k = 0; k < 25; k++)
-        // {
-        //     for (i = 0; i < 25; i++)
-        //     {
-        //         for (j = 0; j < n; j++)
-        //         {
-        //             px[j][i] += vy[k][i] * cx[j][k];                
-        //         }
-        //     }
-        // }
-
-        #pragma omp parallel for private(i,j,k) collapse(2)
         for (k = 0; k < 25; k++)
         {
             for (i = 0; i < 25; i++)
-            {   
-                // n always is 101 so 25 times goes like this
-                for (j = 0; j < n; j+=4)
+            {
+                for (j = 0; j < n; j++)
                 {
-                    px[j][i] += vy[k][i] * cx[j][k];    
-                    px[j+1][i] += vy[k][i] * cx[j+1][k];    
-                    px[j+2][i] += vy[k][i] * cx[j+2][k];    
-                    px[j+3][i] += vy[k][i] * cx[j+3][k];    
+                    px[j][i] += vy[k][i] * cx[j][k];                
                 }
-                // and for n=100:
-                px[n-1][i] += vy[k][i] * cx[n-1][k]; 
             }
         }
-        gettimeofday(&end, NULL); 
+
+        // #pragma omp parallel for private(i,j,k) collapse(2)
+        // for (k = 0; k < 25; k++)
+        // {
+        //     for (i = 0; i < 25; i++)
+        //     {   
+        //         // n always is 101 so 25 times goes like this
+        //         for (j = 0; j < n; j+=4)
+        //         {
+        //             px[j][i] += vy[k][i] * cx[j][k];    
+        //             px[j+1][i] += vy[k][i] * cx[j+1][k];    
+        //             px[j+2][i] += vy[k][i] * cx[j+2][k];    
+        //             px[j+3][i] += vy[k][i] * cx[j+3][k];    
+        //         }
+        //         // and for n=100:
+        //         px[n-1][i] += vy[k][i] * cx[n-1][k]; 
+        //     }
+        // }
+        // // gettimeofday(&end, NULL); 
         
-        #pragma omp critical
+        // #pragma omp critical
         if (count < loop)
         {
          
-            double diff = (end.tv_sec - start.tv_sec) * 1000000.0 + 
-            (end.tv_usec - start.tv_usec);
+            // double diff = (end.tv_sec - start.tv_sec) * 1000000.0 + 
+            // (end.tv_usec - start.tv_usec);
 
-            sum_time += diff;            
+            // sum_time += diff;            
             endloop(21);
         }
 
     } while (count < loop);
-
-    printf("\n--------time of kernel 21: %8.5fms loops:%d ---------\n\n", 
-    (sum_time / count)/1000);
-    sum_time = 0;
+    
+    // printf("\n--------time of kernel 21: %8.5fms loops:%d ---------\n\n", 
+    // (sum_time / count)/1000);
+    // sum_time = 0;
 
     /*
      *******************************************************************
@@ -1477,6 +1477,7 @@ void kernels()
     u[n - 1] = 0.99 * expmax * v[n - 1];
     do
     {
+        printf("ker22 n:%d ",k,n);
         for (k = 0; k < n; k++)
         {
             y[k] = u[k] / v[k];
