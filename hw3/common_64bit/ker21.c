@@ -5,22 +5,23 @@
 #include <time.h>
 #include <omp.h>
 
-#define n 101
-#define count 20
+#define n 1001
+#define count 40
 #define DEBUG 0
+#define THEADS 8
 
 struct timeval start, end;
 
-double px[101][25];
-double cx[101][25];
-double vy[25][101];
+double px[n][25];
+double cx[n][25];
+double vy[25][n];
 
 void print_array(double arr[n][25])
 {
 
     for (int i = 0; i < n; i++)
     {
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < 25; j++)
         {
             printf("%.2f\t", arr[i][j]);
         }
@@ -43,31 +44,29 @@ double serial_calculate()
             cx[i][j] = 2;
 
             vy[j][i] = 2;
-            
-        }    
+        }
     }
 
     ser_msec = clock();
-    
+
     for (k = 0; k < 25; k++)
+    {
+        for (i = 0; i < 25; i++)
         {
-            for (i = 0; i < 25; i++)
+            for (j = 0; j < n; j++)
             {
-                for (j = 0; j < n; j++)
-                {
-                    px[j][i] += vy[k][i] * cx[j][k];                
-                }
+                px[j][i] += vy[k][i] * cx[j][k];
             }
         }
-    
-    ser_msec = (clock() - ser_msec) * 1000000 /CLOCKS_PER_SEC; 
-    
+    }
+
+    ser_msec = (clock() - ser_msec) * 1000000 / CLOCKS_PER_SEC;
+
     return ser_msec;
 }
 
 double paralel_calculate()
 {
-
     int i, j, k;
     clock_t par_msec;
 
@@ -78,43 +77,43 @@ double paralel_calculate()
         {
             px[i][j] = 0;
             cx[i][j] = 2;
-
             vy[j][i] = 2;
-            
-        }    
+        }
     }
-    
+
     par_msec = clock();
-    
-    // #pragma omp parallel for private(i,j,k) collapse(2)
-    #pragma omp parallel shared(px,vy,cx) private(k,i,j)
-    #pragma omp parallel
+    omp_set_num_threads(THEADS);
+#pragma omp parallel shared(px, vy, cx) private(k, i, j)
     {
-        #pragma omp for
-        for (k = 0; k < 25; k++)
+
+#pragma omp for
+        for (j = 0; j < n - 1; j++)
+        {
+            // int nthreads = omp_get_num_threads();
+            // printf("Number of threads = %d\n", nthreads);
+
+            for (k = 0; k < 25; k++)
             {
-                for (i = 0; i < 25; i++)
+                for (i = 0; i < 25; i += 5)
                 {
-                    for (j = 0; j < n; j+=4)
                     {
-                        px[j][i] += vy[k][i] * cx[j][k];                
-                        px[j+1][i] += vy[k][i] * cx[j+1][k];                
-                        px[j+2][i] += vy[k][i] * cx[j+2][k];                
-                        px[j+3][i] += vy[k][i] * cx[j+3][k];                
+                        px[j][i] += vy[k][i] * cx[j][k];
+                        px[j][i + 1] += vy[k][i + 1] * cx[j][k];
+                        px[j][i + 2] += vy[k][i + 2] * cx[j][k];
+                        px[j][i + 3] += vy[k][i + 3] * cx[j][k];
+                        px[j][i + 4] += vy[k][i + 4] * cx[j][k];
                     }
-                    px[n-1][i] += vy[k][i] * cx[n-1][k];                
-                    
                 }
             }
+        }
     }
 
-    par_msec = (clock() - par_msec) * 1000000 /CLOCKS_PER_SEC; 
-    
+    par_msec = (clock() - par_msec) * 1000000 / CLOCKS_PER_SEC;
+
     if (DEBUG)
         print_array(px);
 
-
-    return par_msec; 
+    return par_msec;
 }
 
 int main(int argc, char *argv[])
@@ -127,8 +126,17 @@ int main(int argc, char *argv[])
         avg_ser_msec += serial_calculate();
         avg_par_msec += paralel_calculate();
     }
-	printf("average serial time: %.3f microsecond\n",avg_ser_msec/count);
-    printf("average paralel time: %.3f microsecond\n",avg_par_msec/count);
-    
+    avg_ser_msec = avg_ser_msec / count;
+    avg_par_msec = avg_par_msec / count;
+
+    printf("list size n = %d\n", n);
+    printf("number of threads= %d\n", THEADS);
+    printf("times of run = %d. \n-------------\n", count);
+
+    printf("average serial time: %.3f microsecond\n", avg_ser_msec);
+    printf("average paralel time: %.3f microsecond\n", avg_par_msec);
+
+    printf("-------------\nspeed up: %.3f microsecond\n", avg_ser_msec / avg_par_msec);
+
     return 0;
 }
