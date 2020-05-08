@@ -5,10 +5,10 @@
 #include <time.h>
 #include <omp.h>
 
-#define n 1001
+#define n 101
 #define count 20
 #define DEBUG 0
-#define THEADS 5
+#define THEADS 4
 
 struct timeval start, end;
 

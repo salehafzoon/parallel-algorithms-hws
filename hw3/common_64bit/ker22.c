@@ -4,10 +4,10 @@
 #include <time.h>
 #include <omp.h>
 
-#define n 1001
+#define n 101
 #define count 20
 #define DEBUG 0
-#define THEADS 5
+#define THEADS 3
 
 struct timeval start, end;
 
@@ -52,9 +52,6 @@ double paralel_calculate()
     {
         double expmax = 20.0;
         u[n - 1] = 0.99 * expmax * v[n - 1];
-
-        // int nthreads = omp_get_num_threads();
-        // printf("Number of threads = %d\n", nthreads);
 
 #pragma omp for
         for (k = 0; k < n; k += 4)

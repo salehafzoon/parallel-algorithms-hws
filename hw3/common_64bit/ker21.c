@@ -5,10 +5,10 @@
 #include <time.h>
 #include <omp.h>
 
-#define n 1001
+#define n 101
 #define count 20
 #define DEBUG 0
-#define THEADS 12
+#define THEADS 4
 
 struct timeval start, end;
 
@@ -86,7 +86,7 @@ double paralel_calculate()
 
 #pragma omp parallel shared(px, vy, cx) private(k, i, j)
     {
-#pragma omp for
+#pragma omp for collapse(2)
         for (j = 0; j < n - 1; j++)
         {
             // int nthreads = omp_get_num_threads();
