@@ -6,9 +6,9 @@
 #include <omp.h>
 
 #define n 1001
-#define count 40
+#define count 20
 #define DEBUG 0
-#define THEADS 8
+#define THEADS 12
 
 struct timeval start, end;
 
@@ -83,9 +83,9 @@ double paralel_calculate()
 
     par_msec = clock();
     omp_set_num_threads(THEADS);
+
 #pragma omp parallel shared(px, vy, cx) private(k, i, j)
     {
-
 #pragma omp for
         for (j = 0; j < n - 1; j++)
         {

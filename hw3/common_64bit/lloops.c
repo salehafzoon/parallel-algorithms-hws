@@ -1429,35 +1429,7 @@ void kernels()
             }
         }
 
-        // #pragma omp parallel for private(i,j,k) collapse(2)
-        // for (k = 0; k < 25; k++)
-        // {
-        //     for (i = 0; i < 25; i++)
-        //     {   
-        //         // n always is 101 so 25 times goes like this
-        //         for (j = 0; j < n; j+=4)
-        //         {
-        //             px[j][i] += vy[k][i] * cx[j][k];    
-        //             px[j+1][i] += vy[k][i] * cx[j+1][k];    
-        //             px[j+2][i] += vy[k][i] * cx[j+2][k];    
-        //             px[j+3][i] += vy[k][i] * cx[j+3][k];    
-        //         }
-        //         // and for n=100:
-        //         px[n-1][i] += vy[k][i] * cx[n-1][k]; 
-        //     }
-        // }
-        // // gettimeofday(&end, NULL); 
-        
-        // #pragma omp critical
-        if (count < loop)
-        {
-         
-            // double diff = (end.tv_sec - start.tv_sec) * 1000000.0 + 
-            // (end.tv_usec - start.tv_usec);
-
-            // sum_time += diff;            
-            endloop(21);
-        }
+        endloop(21);
 
     } while (count < loop);
     

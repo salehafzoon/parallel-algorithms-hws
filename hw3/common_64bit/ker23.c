@@ -5,10 +5,10 @@
 #include <time.h>
 #include <omp.h>
 
-#define n 101
-#define count 40
+#define n 1001
+#define count 20
 #define DEBUG 0
-#define THEADS 2
+#define THEADS 5
 
 struct timeval start, end;
 
@@ -52,18 +52,19 @@ double paralel_calculate()
 
     par_msec = clock();
 
-    // #pragma omp parallel for private(i,j,k) collapse(2)
-    // #pragma omp parallel shared(px, vy, cx) private(k, i, j)
-
-    omp_set_num_threads(2);
+    omp_set_num_threads(THEADS);
 #pragma omp parallel
     {
-#pragma omp for
-        // shared(zr, za, zb,zu,zv,zz) reduction(+:za[j][k])
-        for (j = 1; j < 6; j++)
+#pragma omp for private(j) collapse(2)
+        for (k = 1; k < n; k++)
         {
-            for (k = 1; k < n; k++)
+            for (j = 1; j < 6; j+=2)
             {
+                qa = za[j + 1][k] * zr[j][k] + za[j - 1][k] * zb[j][k] +
+                     za[j][k + 1] * zu[j][k] + za[j][k - 1] * zv[j][k] + zz[j][k];
+
+                za[j][k] += 0.175 * (qa - za[j][k]);
+
                 qa = za[j + 1][k] * zr[j][k] + za[j - 1][k] * zb[j][k] +
                      za[j][k + 1] * zu[j][k] + za[j][k - 1] * zv[j][k] + zz[j][k];
 
@@ -90,12 +91,14 @@ int main(int argc, char *argv[])
     avg_ser_msec = avg_ser_msec / count;
     avg_par_msec = avg_par_msec / count;
 
-    printf("optimizing with list size n = %d \nresults based on %d times of run. \n", n, count);
+    printf("list size n = %d\n", n);
+    printf("number of threads= %d\n", THEADS);
+    printf("times of run = %d. \n-------------\n", count);
 
     printf("average serial time: %.3f microsecond\n", avg_ser_msec);
     printf("average paralel time: %.3f microsecond\n", avg_par_msec);
 
-    printf("speed up: %.3f microsecond\n", avg_ser_msec / avg_par_msec);
+    printf("-------------\nspeed up: %.3f microsecond\n", avg_ser_msec / avg_par_msec);
 
     return 0;
 }

@@ -5,9 +5,9 @@
 #include <omp.h>
 
 #define n 1001
-#define count 40
+#define count 20
 #define DEBUG 0
-#define THEADS 2
+#define THEADS 5
 
 struct timeval start, end;
 
@@ -47,8 +47,8 @@ double paralel_calculate()
 
     par_msec = clock();
 
-    omp_set_num_threads(4);
-#pragma omp parallel shared(y, u, v, w, x) private(k)
+    omp_set_num_threads(THEADS);
+#pragma omp parallel private(k)
     {
         double expmax = 20.0;
         u[n - 1] = 0.99 * expmax * v[n - 1];
@@ -62,18 +62,18 @@ double paralel_calculate()
             y[k] = u[k] / v[k];
             w[k] = x[k] / (exp(y[k]) - 1.0);
 
-            y[k + 1] = u[k + 1] / v[k + 1];
-            w[k + 1] = x[k + 1] / (exp(y[k + 1]) - 1.0);
+            // because 101 or 1001 has remaining as 1 when dividing by 4
+            // checking for last loop iteration
+            if (k + 1 < n)
+                y[k + 1] = u[k + 1] / v[k + 1];
+                w[k + 1] = x[k + 1] / (exp(y[k + 1]) - 1.0);
 
-            y[k + 2] = u[k + 2] / v[k + 2];
-            w[k + 2] = x[k + 2] / (exp(y[k + 2]) - 1.0);
-            
-            y[k + 3] = u[k + 3] / v[k + 3];
-            w[k + 3] = x[k + 3] / (exp(y[k + 3]) - 1.0);
-            
+                y[k + 2] = u[k + 2] / v[k + 2];
+                w[k + 2] = x[k + 2] / (exp(y[k + 2]) - 1.0);
+
+                y[k + 3] = u[k + 3] / v[k + 3];
+                w[k + 3] = x[k + 3] / (exp(y[k + 3]) - 1.0);
         }
-        y[n - 1] = u[n - 1] / v[n - 1];
-        w[n - 1] = x[n - 1] / (exp(y[n - 1]) - 1.0);
     }
 
     par_msec = (clock() - par_msec) * 1000000 / CLOCKS_PER_SEC;
@@ -95,12 +95,14 @@ int main(int argc, char *argv[])
     avg_ser_msec = avg_ser_msec / count;
     avg_par_msec = avg_par_msec / count;
 
-    printf("optimizing with list size n = %d \nresults based on %d times of run. \n",n,count);
+    printf("list size n = %d\n", n);
+    printf("number of threads= %d\n", THEADS);
+    printf("times of run = %d. \n-------------\n", count);
 
     printf("average serial time: %.3f microsecond\n", avg_ser_msec);
     printf("average paralel time: %.3f microsecond\n", avg_par_msec);
 
-    printf("speed up: %.3f microsecond\n", avg_ser_msec / avg_par_msec);
+    printf("-------------\nspeed up: %.3f microsecond\n", avg_ser_msec / avg_par_msec);
 
     return 0;
 }
