@@ -8,7 +8,7 @@
 #define n 101
 #define count 20
 #define DEBUG 0
-#define THEADS 4
+#define THEADS 2
 
 struct timeval start, end;
 

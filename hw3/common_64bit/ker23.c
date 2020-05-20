@@ -5,7 +5,7 @@
 #include <time.h>
 #include <omp.h>
 
-#define n 101
+#define n 1001
 #define count 20
 #define DEBUG 0
 #define THEADS 4
@@ -58,17 +58,20 @@ double paralel_calculate()
 #pragma omp for private(j) collapse(2)
         for (k = 1; k < n; k++)
         {
-            for (j = 1; j < 6; j+=2)
+            for (j = 1; j < 6; j += 2)
             {
                 qa = za[j + 1][k] * zr[j][k] + za[j - 1][k] * zb[j][k] +
                      za[j][k + 1] * zu[j][k] + za[j][k - 1] * zv[j][k] + zz[j][k];
 
                 za[j][k] += 0.175 * (qa - za[j][k]);
 
-                qa = za[j + 1][k] * zr[j][k] + za[j - 1][k] * zb[j][k] +
-                     za[j][k + 1] * zu[j][k] + za[j][k - 1] * zv[j][k] + zz[j][k];
+                if (j + 1 < 6)
+                {
+                    qa = za[j + 1][k] * zr[j][k] + za[j - 1][k] * zb[j][k] +
+                         za[j][k + 1] * zu[j][k] + za[j][k - 1] * zv[j][k] + zz[j][k];
 
-                za[j][k] += 0.175 * (qa - za[j][k]);
+                    za[j][k] += 0.175 * (qa - za[j][k]);
+                }
             }
         }
     }

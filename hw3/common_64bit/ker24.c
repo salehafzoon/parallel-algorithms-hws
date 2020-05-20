@@ -8,7 +8,7 @@
 #define n 1001 //dosen't change
 #define count 20
 #define DEBUG 0
-#define THEADS 4
+#define THEADS 2
 
 struct timeval start, end;
 
@@ -52,16 +52,13 @@ double paralel_calculate()
         m24 = 0;
 
 #pragma omp for private(k)
-        for (k = 1; k < n; k += 4)
+        for (k = 1; k < n; k++)
         {
             if (x[k] < x[m24])
+            #pragma critical
+            {
                 m24 = k;
-            if (x[k + 1] < x[m24])
-                m24 = k + 1;
-            if (x[k + 2] < x[m24])
-                m24 = k + 2;
-            if (x[k + 3] < x[m24])
-                m24 = k + 3;
+            }
         }
     }
 
