@@ -50,12 +50,29 @@ struct Individual** initialize_population(int size){
     {
         population[i] = (struct Individual*)malloc(sizeof(struct Individual));
         
-        *population[i] = (struct Individual){"", 100000, creation, evaluation, mutation, print_str};
+        *population[i] = (struct Individual){"", rand()%20, creation, evaluation, mutation, print_str};
         population[i]->create(population[i],size);
-        population[i]->print(population[i]);
+        // population[i]->print(population[i]);
     }
     return population;
 }
+
+
+int sorter(const void *p1, const void *p2) {
+
+    
+    // const struct Individual *in1 = (struct Individual *)p1;
+    // const struct Individual *in2 = (struct Individual *)p2;
+    
+    // if (in1->fitness < in2->fitness)
+    //     return -1;
+    // else if (in1->fitness > in2->fitness)
+    //     return +1;
+    // else
+    //     return 0;
+    return -1;
+}
+ 
 
 int main(void)
 {
@@ -64,7 +81,21 @@ int main(void)
     char target[20] = "saleh";
     int str_size = strlen(target);
     struct Individual** population;
-    initialize_population(str_size);
+    
+    population = initialize_population(str_size);
+    
+    for (i = 0; i < population_size; i++)
+    {
+     population[i]->print(population[i]);   
+    }
+    printf("----------------");
+
+    qsort(population, population_size, sizeof(struct Individual), sorter);
+
+    for (i = 0; i < population_size; i++)
+    {
+     population[i]->print(population[i]);   
+    }
 
     return 0;
 }
