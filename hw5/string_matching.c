@@ -1,8 +1,12 @@
+// # %%writefile ga.cu
+// %%cu
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define population_size 4
+#define population_size 100
+#define max_iteration 20
+#define DEBUG 1
 
 static const char alphanum[] =
         " "
@@ -67,9 +71,6 @@ void uniform_xover(Individual* p1 ,Individual* p2){
     
     char *child_chor1 = (char*)malloc((size)*sizeof(char));
     char *child_chor2 = (char*)malloc((size)*sizeof(char));
-    child_chor1[size-1] = '\0';
-    child_chor2[size-1] = '\0';
-
 
     for (int i = 0; i < size; i++)
     {
@@ -84,7 +85,6 @@ void uniform_xover(Individual* p1 ,Individual* p2){
     }
     p1->chromosome = child_chor1;
     p2->chromosome = child_chor2;
-
 }
 
 Individual** initialize_population(int size,char* target){
@@ -103,7 +103,7 @@ Individual** initialize_population(int size,char* target){
     return population;
 }
 
-int compare (const void ** a, const void ** b)
+int compare (const void * a, const void * b)
 {
 
   Individual **ind1 = (Individual **)a;
@@ -112,23 +112,79 @@ int compare (const void ** a, const void ** b)
   return (*ind1)->fitness - (*ind2)->fitness;
 }
 
+void serial_ga(int str_size,char* target){
+    
+    // int i;
+    Individual** population;
+    population = initialize_population(str_size,target);
+    
+    for (int i = 0; i < max_iteration; i++)
+        {
+            qsort (population, population_size, sizeof(Individual*), compare);
+            
+            if (DEBUG){
+                printf("iteration %d best: ",i);
+                population[0]->print(population[0]);
+            }
+
+            //terminate condition
+            if (population[0]->fitness == 0){
+                break;
+            }
+
+            //10 percent of population move to next generation
+            int index = ((int)0.1*population_size);
+            
+            for (int j = index; j< population_size ; j+=2){
+                
+                population[j]->cross_over(population[j],population[j+1]);
+
+                if (rand()%10 <2){
+                    population[j]->mutate(population[j]);
+                }
+                if (rand()%10 <2){
+                    population[j+1]->mutate(population[j+1]);
+                }
+            }
+
+            for (int j = 0; j< population_size ; j++){
+                population[j]->evaluate(population[j],target);
+            }
+
+        }
+            
+    printf("solution founded:\n");
+    population[0]->print(population[0]);
+
+    //freeing pointers
+    for (int i = 0; i< population_size ; i++){
+            free(population[i]);
+        }
+    free(population);
+
+    return;
+}
 int main(void)
 {
-
     int i=0;
+    
     char target[30] = "HELLO WORLD";
     int str_size = strlen(target);
+    serial_ga(str_size,target);
+ 
+    /*
+
     Individual** population;
-
     population = initialize_population(str_size,target);
-
+ 
     for (i = 0; i < population_size; i++)
         {
         population[i]->print(population[i]);   
         }
 
-    qsort (population, population_size, sizeof(Individual*), compare);
+    //qsort (population, population_size, sizeof(Individual*), compare);
 
+    population[0]->cross_over(population[0],population[1]);
     printf("------------------\n");
 
     for (i = 0; i < population_size; i++)
@@ -136,5 +192,9 @@ int main(void)
         population[i]->print(population[i]);   
         }
 
+    population[0]->mutate(population[0]);
+    printf("after mutate child 1\n");
+    population[0]->print(population[0]);   
+    */
     return 0;
 }
