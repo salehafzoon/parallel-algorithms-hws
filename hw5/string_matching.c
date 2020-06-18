@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 #define population_size 100
-#define max_iteration 20
+#define max_iteration 50
 #define DEBUG 1
 
 static const char alphanum[] =
@@ -87,6 +87,32 @@ void uniform_xover(Individual* p1 ,Individual* p2){
     p2->chromosome = child_chor2;
 }
 
+void two_point_xover(Individual* p1 ,Individual* p2){
+    int size = strlen(p1->chromosome);
+    
+    char *child_chor1 = (char*)malloc((size)*sizeof(char));
+    char *child_chor2 = (char*)malloc((size)*sizeof(char));
+
+    int i2 , i1 = rand()%size;
+    while(i2 == i1)
+        i2= rand()%size;
+    
+    for (int i = 0; i < size; i++)
+    {
+        if (i>=i1 && i<i2){
+            child_chor1[i] = p1->chromosome[i];
+            child_chor2[i] = p2->chromosome[i];    
+        }else
+        {
+            child_chor1[i] = p2->chromosome[i];
+            child_chor2[i] = p1->chromosome[i];        
+        }
+    }
+    
+    p1->chromosome = child_chor1;
+    p2->chromosome = child_chor2;
+}
+
 Individual** initialize_population(int size,char* target){
 
     Individual** population = (Individual**)malloc(population_size * sizeof(Individual*)); 
@@ -96,7 +122,7 @@ Individual** initialize_population(int size,char* target){
     {
         population[i] = (Individual*)malloc(sizeof(Individual));
         
-        *population[i] = (Individual){"", rand()%20, creation, evaluation, mutation,uniform_xover, print_str};
+        *population[i] = (Individual){"", 100000, creation, evaluation, mutation,uniform_xover, print_str};
         population[i]->create(population[i],size,target);
         // population[i]->print(population[i]);
     }
@@ -132,17 +158,17 @@ void serial_ga(int str_size,char* target){
                 break;
             }
 
-            //10 percent of population move to next generation
-            int index = ((int)0.1*population_size);
+            //20 percent of population move to next generation
+            int index = ((int)0.2*population_size);
             
             for (int j = index; j< population_size ; j+=2){
                 
                 population[j]->cross_over(population[j],population[j+1]);
 
-                if (rand()%10 <2){
+                if (rand()%10 <1){
                     population[j]->mutate(population[j]);
                 }
-                if (rand()%10 <2){
+                if (rand()%10 <1){
                     population[j+1]->mutate(population[j+1]);
                 }
             }
