@@ -1,2 +1,1 @@
-writefile ga.cu
-// %%cu
+max_iteration

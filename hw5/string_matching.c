@@ -4,8 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define population_size 100
-#define max_iteration 50
+#define population_size 10
+#define max_iteration 3
 #define DEBUG 1
 
 static const char alphanum[] =
@@ -14,6 +14,7 @@ static const char alphanum[] =
         // "abcdefghijklmnopqrstuvwxyz";
 
 typedef struct Individual Individual;
+typedef struct Childs Childs;
 
 struct Individual
 {
@@ -23,8 +24,13 @@ struct Individual
     void (*create)(Individual*,int size,char* target);
     void (*evaluate)(Individual*,char* target);
     void (*mutate)(Individual*);
-    void (*cross_over)(Individual*,Individual*);
+    Childs (*cross_over)(Individual* ,Individual* , Individual *,Individual *);
     void (*print)(Individual*);
+};
+struct Childs
+{
+    Individual * child1;
+    Individual * child2; 
 };
 
 int str_compare(char* str1,char* str2){
@@ -66,52 +72,30 @@ void creation(Individual* ind,int size,char* target) {
     ind->evaluate(ind,target);
 }
 
-void uniform_xover(Individual* p1 ,Individual* p2){
+void uniform_xover(Individual* p1 ,Individual* p2 , Individual *c1,Individual *c2){
+    
+    
     int size = strlen(p1->chromosome);
     
-    char *child_chor1 = (char*)malloc((size)*sizeof(char));
-    char *child_chor2 = (char*)malloc((size)*sizeof(char));
+    // printf("\nchilds in xover and size = %d \n",size);
+    // c1->print(c1);
+    // c2->print(c1);
 
     for (int i = 0; i < size; i++)
     {
-        if (rand()%10 < 5){
-            child_chor1[i] = p1->chromosome[i];
-            child_chor2[i] = p2->chromosome[i];
+        if (rand()%10 < 10){
+            c1->chromosome[i] = p1->chromosome[i];
+            c2->chromosome[i] = p2->chromosome[i];
         }
         else{
-            child_chor2[i] = p1->chromosome[i];
-            child_chor1[i] = p2->chromosome[i];
+            c2->chromosome[i] = p1->chromosome[i];
+            c1->chromosome[i] = p2->chromosome[i];
         }
-    }
-    p1->chromosome = child_chor1;
-    p2->chromosome = child_chor2;
-}
-
-void two_point_xover(Individual* p1 ,Individual* p2){
-    int size = strlen(p1->chromosome);
     
-    char *child_chor1 = (char*)malloc((size)*sizeof(char));
-    char *child_chor2 = (char*)malloc((size)*sizeof(char));
-
-    int i2 , i1 = rand()%size;
-    while(i2 == i1)
-        i2= rand()%size;
-    
-    for (int i = 0; i < size; i++)
-    {
-        if (i>=i1 && i<i2){
-            child_chor1[i] = p1->chromosome[i];
-            child_chor2[i] = p2->chromosome[i];    
-        }else
-        {
-            child_chor1[i] = p2->chromosome[i];
-            child_chor2[i] = p1->chromosome[i];        
-        }
     }
     
-    p1->chromosome = child_chor1;
-    p2->chromosome = child_chor2;
 }
+
 
 Individual** initialize_population(int size,char* target){
 
@@ -138,58 +122,122 @@ int compare (const void * a, const void * b)
   return (*ind1)->fitness - (*ind2)->fitness;
 }
 
+Individual** allocate_space(){
+    Individual** next_generation = (Individual**)malloc(population_size * sizeof(Individual*)); 
+
+    for (int i = 0; i < population_size; i++)
+    {
+        next_generation[i] = (Individual*)malloc(sizeof(Individual));
+    }
+
+    return next_generation;
+}
+
+void print_array(Individual** arr){
+    for (int i = 0; i < population_size; i++)
+    {
+        arr[i]->print(arr[i]);
+    }
+    printf("---------------\n");
+
+}
 void serial_ga(int str_size,char* target){
     
-    // int i;
-    Individual** population;
-    population = initialize_population(str_size,target);
+    int i,j;
+    int p1,p2;
+    Individual *child1,*child2;
+    child1 = (Individual*)malloc((str_size)*sizeof(Individual));
+    child2 = (Individual*)malloc((str_size)*sizeof(Individual));
+   
+    *child1 = (Individual){"", 100000, creation, evaluation, mutation,uniform_xover, print_str};
+    *child2 = (Individual){"", 100000, creation, evaluation, mutation,uniform_xover, print_str};
+
+    child1->create(child1,str_size,target);
+    child2->create(child2,str_size,target);
     
-    for (int i = 0; i < max_iteration; i++)
+    // child1->print(child1);
+    // child2->print(child2);
+    
+    
+    Individual** population = initialize_population(str_size,target);
+    Individual** next_generation = initialize_population(str_size,target);
+    
+    for (i = 0; i < max_iteration; i++)
         {
             qsort (population, population_size, sizeof(Individual*), compare);
-            
+
             if (DEBUG){
+                print_array(population);
                 printf("iteration %d best: ",i);
                 population[0]->print(population[0]);
             }
 
             //terminate condition
             if (population[0]->fitness == 0){
+                printf("solution founded:\n");
                 break;
             }
-
-            //20 percent of population move to next generation
-            int index = ((int)0.2*population_size);
             
-            for (int j = index; j< population_size ; j+=2){
+            for (j = 0; j< population_size ; j+=2){
                 
-                population[j]->cross_over(population[j],population[j+1]);
+                p1 = rand() % population_size;
+                p2 = rand() % population_size;
+                // printf("p1:%d \t p2:%d",p1,p2);
+
+                population[p1]->cross_over(population[p1],population[p2],child1,child2);
 
                 if (rand()%10 <1){
-                    population[j]->mutate(population[j]);
+                    child1->mutate(child1);
+                    child2->mutate(child2);
                 }
-                if (rand()%10 <1){
-                    population[j+1]->mutate(population[j+1]);
-                }
+
+                child1->evaluate(child1,target);
+                child2->evaluate(child2,target);
+
+                // printf("---------childrens----------\n");
+                // child1->print(child1);
+                // child2->print(child2);
+                
+                *next_generation[j] = *child1;
+                *next_generation[j+1] = *child2;
+                
+                // printf("---------childs in next generation----------\n");
+                // next_generation[j]->print(next_generation[j]);
+                // next_generation[j+1]->print(next_generation[j+1]);
+                
             }
+            
+            qsort (next_generation, population_size, sizeof(Individual*), compare);
+            
+            printf("---------next generation----------\n");
+            print_array(next_generation);
 
-            for (int j = 0; j< population_size ; j++){
-                population[j]->evaluate(population[j],target);
+            // 20% of previous generation best and 80% of next_generation best
+            for (j = population_size * 0.2 ; j< population_size ; j++){
+                *population[j] = *next_generation[j];
+                
+                // population[j]->fitness = next_generation[j]->fitness;
+                // population[j]->chromosome = next_generation[j]->chromosome;
+                
             }
 
         }
             
-    printf("solution founded:\n");
     population[0]->print(population[0]);
 
-    //freeing pointers
+    // freeing pointers
     for (int i = 0; i< population_size ; i++){
             free(population[i]);
+            free(next_generation[i]);   
         }
     free(population);
+    free(next_generation);
+    free(child1);
+    free(child2);
 
     return;
 }
+
 int main(void)
 {
     int i=0;
