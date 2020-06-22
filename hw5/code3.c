@@ -107,6 +107,20 @@ Individual** initialize_population(int size,char* target,int population_size){
     return population;
 }
 
+Individual** initial_array(int pop_size,int str_size){
+    Individual** arr = (Individual**)malloc(pop_size * sizeof(Individual*)); 
+
+    for (int i = 0; i < pop_size; i++)
+    {
+        arr[i] = (Individual*)malloc(sizeof(Individual));
+        
+        char* chrom = (char*)malloc(str_size * sizeof(char));
+     
+        *arr[i] = (Individual){chrom, 100000, creation, evaluation, mutation,uniform_xover, print_str};
+    }
+    return arr;
+}
+
 int compare (const void * a, const void * b)
 {
 
@@ -136,125 +150,108 @@ void copy_array(Individual** src,Individual** dest,int start,int end){
     }
 }
 
-void serial_task (Individual** pop, Individual** next_pop, int pop_size,char* target){
-    int j,begin,p1,p2;
-    
-    // percent of population move to next generation
-    begin = pop_size*0.01;
+void serial_eval(Individual** pop,int size,char* target){
+    for (int i = 0; i < size; i++)
+    {
+        pop[i]->evaluate(pop[i],target);
+    }   
+}
 
-    copy_array(pop,next_pop,0,begin);
-
-    int cap = begin;
-
-    for (j = begin; j< pop_size ; j+=2){
-                
-        p1 = tournament_selection(pop,pop_size);
-        p2 = tournament_selection(pop,pop_size);
-
-        // p1 = j;
-        // p2 = j+1;
-        
-        pop[p1]->cross_over(pop[p1],pop[p2]);
-
-        if (rand()%10 < MUTATION_RATE){
-            pop[p1]->mutate(pop[p1]);
-        }
-        if (rand()%10 < MUTATION_RATE){
-            pop[p2]->mutate(pop[p2]);
-        }
-       
-       *next_pop[cap] = *pop[p1];
-       *next_pop[cap+1] = *pop[p2];
-       cap+=2;
-    }
-
-    for (j = 0; j< cap ; j++){
-        next_pop[j]->evaluate(next_pop[j],target);
-            }
-
-    qsort (next_pop, pop_size, sizeof(Individual*), compare);
-    
-    copy_array(next_pop,pop,begin,pop_size);
-
+void parallel_eval(Individual** pop,int size,char* target){
+    for (int i = 0; i < size; i++)
+    {
+        pop[i]->evaluate(pop[i],target);
+    }   
 }
 
 /*
 __global__ 
-void parallel_task(Individual** population,int population_size,char* target){
-    
-    // percent of population move to next generation
-    int begin = population_size*0.02;
+void parallel_task(Individual** pop,char* target){
     
     // the initial index that this thread will work on
-    int tid = begin + blockDim.x * blockIdx.x + threadIdx.x;
+    int tid = blockDim.x * blockIdx.x + threadIdx.x;
     
-    while (tid < POP_SIZE -1) {
-        
-        population[tid]->cross_over(population[tid],population[tid+1]);
-
-        
-        if (rand()%10 < MUTATION_RATE){
-            population[tid]->mutate(population[tid]);
-        }
-        if (rand()%10 < MUTATION_RATE){
-            population[tid+1]->mutate(population[tid+1]);
-        }
-        
-        
-        population[tid]->evaluate(population[tid],target);
-        population[tid+1]->evaluate(population[tid+1],target);
+    while (tid < pop_size) {    
+        pop[tid]->evaluate(pop[tid],target);
     }
-
 }
 */
 
-Individual** initial_array(int pop_size,int str_size){
-    Individual** arr = (Individual**)malloc(pop_size * sizeof(Individual*)); 
 
-    for (int i = 0; i < pop_size; i++)
-    {
-        arr[i] = (Individual*)malloc(sizeof(Individual));
-        
-        char* chrom = (char*)malloc(str_size * sizeof(char));
-     
-        *arr[i] = (Individual){chrom, 100000, creation, evaluation, mutation,uniform_xover, print_str};
-    }
-    return arr;
-}
 void ga(int str_size,char* target,int pop_size,int parallel){
     
-    int i;
-    Individual** population,** next_pop;
-    population = initialize_population(str_size,target,pop_size);
+    int i,j,begin,p1,p2,cap;
+    Individual** pop,** next_pop,** dev_pop;
+
+    pop = initialize_population(str_size,target,pop_size);
     next_pop = initial_array(2*pop_size,str_size);
     
+    // cudaMalloc(&dev_pop, pop_size * sizeof(Individual*));
+
     for (i = 0; i < MAX_GENERATION; i++)
         {
-            qsort (population, pop_size, sizeof(Individual*), compare);
+            qsort (pop, pop_size, sizeof(Individual*), compare);
             
             if (DEBUG){
                 printf("iteration %d best: ",i);
-                population[0]->print(population[0]);
+                pop[0]->print(pop[0]);
             }
 
             //terminate condition
-            if (population[0]->fitness == 0){
+            if (pop[0]->fitness == 0){
                 printf("solution founded:\n");
                 break;
             }
-            serial_task(population,next_pop,pop_size,target);
+
+            // percent of population move to next generation
+            begin = pop_size*0.01;
+
+            copy_array(pop,next_pop,0,begin);
+
+            cap = begin;
+
+            for (j = begin; j< pop_size ; j+=2){
+                        
+                p1 = tournament_selection(pop,pop_size);
+                p2 = tournament_selection(pop,pop_size);
+
+                pop[p1]->cross_over(pop[p1],pop[p2]);
+
+                if (rand()%10 < MUTATION_RATE){
+                    pop[p1]->mutate(pop[p1]);
+                }
+                if (rand()%10 < MUTATION_RATE){
+                    pop[p2]->mutate(pop[p2]);
+                }
+            
+            *next_pop[cap] = *pop[p1];
+            *next_pop[cap+1] = *pop[p2];
+            cap+=2;
+            }
+
+            if(parallel){
+                parallel_eval(next_pop,pop_size,target);
+            }
+            else
+            {
+                serial_eval(next_pop,pop_size,target);
+            }
+
+            qsort (next_pop, pop_size, sizeof(Individual*), compare);
+            
+            copy_array(next_pop,pop,begin,pop_size);
             
         }
             
-    population[0]->print(population[0]);
+    pop[0]->print(pop[0]);
 
     //freeing pointers
     for (i = 0; i< pop_size ; i++){
-            free(population[i]);
+            free(pop[i]);
             free(next_pop[i]); 
         }
 
-    free(population);
+    free(pop);
     free(next_pop);
 
     return;
