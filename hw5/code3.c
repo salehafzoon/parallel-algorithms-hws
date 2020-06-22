@@ -1,13 +1,13 @@
-// %%writefile ga.cu
 //%%cu
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-// #include<cuda.h>
 
-#define MUTATION_RATE 2
-#define MAX_GENERATION 200
+#define MUTATION_RATE 1
+#define MAX_GENERATION 300
 #define DEBUG 0
+
+#define numThread 50 // threads in a block
 
 static const char alphanum[] =
         " "
@@ -15,6 +15,8 @@ static const char alphanum[] =
         // "abcdefghijklmnopqrstuvwxyz";
 
 typedef struct Individual Individual;
+
+int pop_size;
 
 struct Individual
 {
@@ -113,15 +115,74 @@ int compare (const void * a, const void * b)
   return (*ind1)->fitness - (*ind2)->fitness;
 }
 
-void ga(int str_size,char* target, int population_size){
+void serial_task (Individual** population,int population_size,char* target){
+    int j,index,p1,p2;
     
-    int i,j,index,p1,p2;
-    Individual** population;
-    population = initialize_population(str_size,target,population_size);
+    // percent of population move to next generation
+    index = population_size*0.02;
+         
+    for (j = index; j< population_size ; j+=2){
+                
+        //p1 = (rand() % (int)(population_size * 0.6)) +index;
+        //p2 = (rand() % (int)(population_size* 0.6)) +index;
+        
+        p1 = j;
+        p2 = j+1;
+        
+        population[p1]->cross_over(population[p1],population[p2]);
+
+        if (rand()%10 < MUTATION_RATE){
+            population[p1]->mutate(population[p1]);
+        }
+        if (rand()%10 < MUTATION_RATE){
+            population[p2]->mutate(population[p2]);
+        }
+    }
+
+    for (j = 0; j< population_size ; j++){
+                population[j]->evaluate(population[j],target);
+            }
+}
+
+/*
+__global__ 
+void parallel_task(Individual** population,int population_size,char* target){
+    
+    // percent of population move to next generation
+    int begin = population_size*0.02;
+    
+    // the initial index that this thread will work on
+    int tid = begin + blockDim.x * blockIdx.x + threadIdx.x;
+    
+    while (tid < POP_SIZE -1) {
+        
+        population[tid]->cross_over(population[tid],population[tid+1]);
+
+        
+        if (rand()%10 < MUTATION_RATE){
+            population[tid]->mutate(population[tid]);
+        }
+        if (rand()%10 < MUTATION_RATE){
+            population[tid+1]->mutate(population[tid+1]);
+        }
+        
+        
+        population[tid]->evaluate(population[tid],target);
+        population[tid+1]->evaluate(population[tid+1],target);
+    }
+
+}
+*/
+
+void ga(int str_size,char* target,int pop_size,int parallel){
+    
+    int i;
+    Individual** population,dev_pop;
+    population = initialize_population(str_size,target,pop_size);
     
     for (i = 0; i < MAX_GENERATION; i++)
         {
-            qsort (population, population_size, sizeof(Individual*), compare);
+            qsort (population, pop_size, sizeof(Individual*), compare);
             
             if (DEBUG){
                 printf("iteration %d best: ",i);
@@ -133,30 +194,14 @@ void ga(int str_size,char* target, int population_size){
                 printf("solution founded:\n");
                 break;
             }
-
-            index = population_size*0.02;
-         
-            for (j = index; j< population_size ; j+=2){
-                        
-                p1 = j;
-                p2 = j+1;
-                
-                population[p1]->cross_over(population[p1],population[p2]);
-
-                if (rand()%10 < MUTATION_RATE){
-                    population[p1]->mutate(population[p1]);
-                }
-                if (rand()%10 < MUTATION_RATE){
-                    population[p2]->mutate(population[p2]);
-                }
-            }
-
+            serial_task(population,pop_size,target);
+            
         }
             
     population[0]->print(population[0]);
 
     //freeing pointers
-    for (i = 0; i< population_size ; i++){
+    for (i = 0; i< pop_size ; i++){
             free(population[i]);
         }
     free(population);
@@ -165,16 +210,17 @@ void ga(int str_size,char* target, int population_size){
 }
 int main(int argc , char* argv[]){
 
-	  //clock_t ser_msec;
-	//   int population_size = atoi(argv[1]);
-	  int population_size = 1000;
-
-    printf("population size = %d \t max generation = %d \n ",population_size,MAX_GENERATION);
+	// pop_size = atoi(argv[1]);
+    // int parallel = atoi(argv[2]);
+    
+    pop_size = 300;
+    int parallel = 0;
+    
+    printf("population size = %d \t max generation = %d \n ",pop_size,MAX_GENERATION);
 
     char target[30] = "HELLO WORLD";
     int str_size = strlen(target);
-    // int parallel = 0;
-    ga(str_size,target,population_size);
+    ga(str_size,target,pop_size,parallel);
  
     return 0;
 }

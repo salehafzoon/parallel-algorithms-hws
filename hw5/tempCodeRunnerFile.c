@@ -1,1 +1,2 @@
-max_iteration
+
+    int parallel = 0;
