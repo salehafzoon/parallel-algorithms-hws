@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 #define MUTATION_RATE 1
-#define MAX_GENERATION 200
+#define MAX_GENERATION 500
 #define DEBUG 1
-#define TOURNAMENT_SIZE 5
+#define TOURNAMENT_SIZE 10
 
 #define numThread 50 // threads in a block
 
@@ -129,27 +129,30 @@ int tournament_selection(Individual** population,int pop_size){
     return index;
 }
 
-void copy_array(Individual** src,Individual** dest,int size){
-    for (int i = 0; i < size; i++)
+void copy_array(Individual** src,Individual** dest,int start,int end){
+    for (int i = start; i < end; i++)
     {
         *dest[i] = *src[i];
     }
 }
+
 void serial_task (Individual** pop, Individual** next_pop, int pop_size,char* target){
     int j,begin,p1,p2;
     
     // percent of population move to next generation
-    begin = pop_size*0.02;
+    begin = pop_size*0.01;
 
-    copy_array(pop,next_pop,begin);
+    copy_array(pop,next_pop,0,begin);
+
+    int cap = begin;
 
     for (j = begin; j< pop_size ; j+=2){
                 
-        // p1 = tournament_selection(population,pop_size);
-        // p2 = tournament_selection(population,pop_size);
+        p1 = tournament_selection(pop,pop_size);
+        p2 = tournament_selection(pop,pop_size);
 
-        p1 = j;
-        p2 = j+1;
+        // p1 = j;
+        // p2 = j+1;
         
         pop[p1]->cross_over(pop[p1],pop[p2]);
 
@@ -159,11 +162,20 @@ void serial_task (Individual** pop, Individual** next_pop, int pop_size,char* ta
         if (rand()%10 < MUTATION_RATE){
             pop[p2]->mutate(pop[p2]);
         }
+       
+       *next_pop[cap] = *pop[p1];
+       *next_pop[cap+1] = *pop[p2];
+       cap+=2;
     }
 
-    for (j = 0; j< pop_size ; j++){
-                pop[j]->evaluate(pop[j],target);
+    for (j = 0; j< cap ; j++){
+        next_pop[j]->evaluate(next_pop[j],target);
             }
+
+    qsort (next_pop, pop_size, sizeof(Individual*), compare);
+    
+    copy_array(next_pop,pop,begin,pop_size);
+
 }
 
 /*
@@ -214,7 +226,7 @@ void ga(int str_size,char* target,int pop_size,int parallel){
     int i;
     Individual** population,** next_pop;
     population = initialize_population(str_size,target,pop_size);
-    next_pop = initial_array(pop_size,str_size);
+    next_pop = initial_array(2*pop_size,str_size);
     
     for (i = 0; i < MAX_GENERATION; i++)
         {
@@ -252,7 +264,7 @@ int main(int argc , char* argv[]){
 	// pop_size = atoi(argv[1]);
     // int parallel = atoi(argv[2]);
     
-    pop_size = 500;
+    pop_size = 800;
     int parallel = 0;
     
     printf("population size = %d \t max generation = %d \n ",pop_size,MAX_GENERATION);
