@@ -1,2 +1,1 @@
-
-    int parallel = 0;
+size

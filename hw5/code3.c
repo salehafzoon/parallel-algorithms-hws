@@ -4,8 +4,9 @@
 #include <stdlib.h>
 
 #define MUTATION_RATE 1
-#define MAX_GENERATION 300
-#define DEBUG 0
+#define MAX_GENERATION 200
+#define DEBUG 1
+#define TOURNAMENT_SIZE 5
 
 #define numThread 50 // threads in a block
 
@@ -98,7 +99,7 @@ Individual** initialize_population(int size,char* target,int population_size){
     {
         population[i] = (Individual*)malloc(sizeof(Individual));
         
-        char* chrom = (char*)malloc(strlen(target) * sizeof(char));
+        char* chrom = (char*)malloc(size * sizeof(char));
      
         *population[i] = (Individual){chrom, 100000, creation, evaluation, mutation,uniform_xover, print_str};
         population[i]->create(population[i],size,target);
@@ -115,32 +116,53 @@ int compare (const void * a, const void * b)
   return (*ind1)->fitness - (*ind2)->fitness;
 }
 
-void serial_task (Individual** population,int population_size,char* target){
-    int j,index,p1,p2;
+int tournament_selection(Individual** population,int pop_size){
+    int index = rand() % pop_size;
+    int j;
+
+    for (int i = 0; i < TOURNAMENT_SIZE; i++)
+    {
+        j = rand() % pop_size;
+        if ( population[j]->fitness < population[index]->fitness )
+            index = j;
+    }
+    return index;
+}
+
+void copy_array(Individual** src,Individual** dest,int size){
+    for (int i = 0; i < size; i++)
+    {
+        *dest[i] = *src[i];
+    }
+}
+void serial_task (Individual** pop, Individual** next_pop, int pop_size,char* target){
+    int j,begin,p1,p2;
     
     // percent of population move to next generation
-    index = population_size*0.02;
-         
-    for (j = index; j< population_size ; j+=2){
+    begin = pop_size*0.02;
+
+    copy_array(pop,next_pop,begin);
+
+    for (j = begin; j< pop_size ; j+=2){
                 
-        //p1 = (rand() % (int)(population_size * 0.6)) +index;
-        //p2 = (rand() % (int)(population_size* 0.6)) +index;
-        
+        // p1 = tournament_selection(population,pop_size);
+        // p2 = tournament_selection(population,pop_size);
+
         p1 = j;
         p2 = j+1;
         
-        population[p1]->cross_over(population[p1],population[p2]);
+        pop[p1]->cross_over(pop[p1],pop[p2]);
 
         if (rand()%10 < MUTATION_RATE){
-            population[p1]->mutate(population[p1]);
+            pop[p1]->mutate(pop[p1]);
         }
         if (rand()%10 < MUTATION_RATE){
-            population[p2]->mutate(population[p2]);
+            pop[p2]->mutate(pop[p2]);
         }
     }
 
-    for (j = 0; j< population_size ; j++){
-                population[j]->evaluate(population[j],target);
+    for (j = 0; j< pop_size ; j++){
+                pop[j]->evaluate(pop[j],target);
             }
 }
 
@@ -174,11 +196,25 @@ void parallel_task(Individual** population,int population_size,char* target){
 }
 */
 
+Individual** initial_array(int pop_size,int str_size){
+    Individual** arr = (Individual**)malloc(pop_size * sizeof(Individual*)); 
+
+    for (int i = 0; i < pop_size; i++)
+    {
+        arr[i] = (Individual*)malloc(sizeof(Individual));
+        
+        char* chrom = (char*)malloc(str_size * sizeof(char));
+     
+        *arr[i] = (Individual){chrom, 100000, creation, evaluation, mutation,uniform_xover, print_str};
+    }
+    return arr;
+}
 void ga(int str_size,char* target,int pop_size,int parallel){
     
     int i;
-    Individual** population,dev_pop;
+    Individual** population,** next_pop;
     population = initialize_population(str_size,target,pop_size);
+    next_pop = initial_array(pop_size,str_size);
     
     for (i = 0; i < MAX_GENERATION; i++)
         {
@@ -194,7 +230,7 @@ void ga(int str_size,char* target,int pop_size,int parallel){
                 printf("solution founded:\n");
                 break;
             }
-            serial_task(population,pop_size,target);
+            serial_task(population,next_pop,pop_size,target);
             
         }
             
@@ -203,8 +239,11 @@ void ga(int str_size,char* target,int pop_size,int parallel){
     //freeing pointers
     for (i = 0; i< pop_size ; i++){
             free(population[i]);
+            free(next_pop[i]); 
         }
+
     free(population);
+    free(next_pop);
 
     return;
 }
@@ -213,7 +252,7 @@ int main(int argc , char* argv[]){
 	// pop_size = atoi(argv[1]);
     // int parallel = atoi(argv[2]);
     
-    pop_size = 300;
+    pop_size = 500;
     int parallel = 0;
     
     printf("population size = %d \t max generation = %d \n ",pop_size,MAX_GENERATION);
