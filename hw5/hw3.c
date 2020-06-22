@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #define MUTATION_RATE 1
-#define MAX_GENERATION 500
+#define MAX_GENERATION 200
 #define DEBUG 1
 #define TOURNAMENT_SIZE 10
 
@@ -258,11 +258,11 @@ void ga(int str_size,char* target,int pop_size,int parallel){
 }
 int main(int argc , char* argv[]){
 
-	// pop_size = atoi(argv[1]);
-    // int parallel = atoi(argv[2]);
+	pop_size = atoi(argv[1]);
+    int parallel = atoi(argv[2]);
     
-    pop_size = 800;
-    int parallel = 0;
+    // pop_size = 800;
+    // int parallel = 0;
     
     printf("population size = %d \t max generation = %d \n ",pop_size,MAX_GENERATION);
 
