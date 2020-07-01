@@ -1,14 +1,13 @@
-//%%cu
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include<time.h>
 
 #define MUTATION_RATE 1
-#define MAX_GENERATION 200
+#define MAX_GENERATION 10000
 #define DEBUG 1
-#define TOURNAMENT_SIZE 10
-
-#define numThread 50 // threads in a block
+#define TOURNAMENT_SIZE 5
 
 static const char alphanum[] =
         " "
@@ -18,10 +17,12 @@ static const char alphanum[] =
 typedef struct Individual Individual;
 
 int pop_size;
+int max_iteration;
+int full;
 
 struct Individual
 {
-    char* chromosome;
+    char chromosome[20];
     int fitness;
     
     void (*create)(Individual*,int size,char* target);
@@ -70,9 +71,9 @@ void creation(Individual* ind,int size,char* target) {
 void uniform_xover(Individual* p1 ,Individual* p2){
     int size = strlen(p1->chromosome);
     
-    char *child_chor1 = (char*)malloc((size)*sizeof(char));
-    char *child_chor2 = (char*)malloc((size)*sizeof(char));
-
+    char child_chor1[size];
+    char child_chor2[size];
+    
     for (int i = 0; i < size; i++)
     {
         if (rand()%10 < 5){
@@ -84,11 +85,9 @@ void uniform_xover(Individual* p1 ,Individual* p2){
             child_chor1[i] = p2->chromosome[i];
         }
     }
-    free(p1->chromosome);
-    free(p2->chromosome);
-    
-    p1->chromosome = child_chor1;
-    p2->chromosome = child_chor2;
+
+    strcpy(p1->chromosome ,child_chor1);
+    strcpy(p2->chromosome ,child_chor2);
 }
 
 Individual** initialize_population(int size,char* target,int population_size){
@@ -99,9 +98,7 @@ Individual** initialize_population(int size,char* target,int population_size){
     {
         population[i] = (Individual*)malloc(sizeof(Individual));
         
-        char* chrom = (char*)malloc(size * sizeof(char));
-     
-        *population[i] = (Individual){chrom, 100000, creation, evaluation, mutation,uniform_xover, print_str};
+        *population[i] = (Individual){" ", 100000, creation, evaluation, mutation,uniform_xover, print_str};
         population[i]->create(population[i],size,target);
     }
     return population;
@@ -114,9 +111,7 @@ Individual** initial_array(int pop_size,int str_size){
     {
         arr[i] = (Individual*)malloc(sizeof(Individual));
         
-        char* chrom = (char*)malloc(str_size * sizeof(char));
-     
-        *arr[i] = (Individual){chrom, 100000, creation, evaluation, mutation,uniform_xover, print_str};
+        *arr[i] = (Individual){" ", 100000, creation, evaluation, mutation,uniform_xover, print_str};
     }
     return arr;
 }
@@ -157,38 +152,16 @@ void serial_eval(Individual** pop,int size,char* target){
     }   
 }
 
-void parallel_eval(Individual** pop,int size,char* target){
-    for (int i = 0; i < size; i++)
-    {
-        pop[i]->evaluate(pop[i],target);
-    }   
-}
-
-/*
-__global__ 
-void parallel_task(Individual** pop,char* target){
-    
-    // the initial index that this thread will work on
-    int tid = blockDim.x * blockIdx.x + threadIdx.x;
-    
-    while (tid < pop_size) {    
-        pop[tid]->evaluate(pop[tid],target);
-    }
-}
-*/
-
-
-void ga(int str_size,char* target,int pop_size,int parallel){
+void ga(int str_size,char* target,int pop_size,int max_iteration,int full){
     
     int i,j,begin,p1,p2,cap;
     Individual** pop,** next_pop,** dev_pop;
-
+    
     pop = initialize_population(str_size,target,pop_size);
     next_pop = initial_array(2*pop_size,str_size);
     
-    // cudaMalloc(&dev_pop, pop_size * sizeof(Individual*));
 
-    for (i = 0; i < MAX_GENERATION; i++)
+    for (i = 0; i < max_iteration; i++)
         {
             qsort (pop, pop_size, sizeof(Individual*), compare);
             
@@ -198,12 +171,14 @@ void ga(int str_size,char* target,int pop_size,int parallel){
             }
 
             //terminate condition
-            if (pop[0]->fitness == 0){
+            
+            if (full==0 && pop[0]->fitness == 0){
                 printf("solution founded:\n");
                 break;
             }
+            
 
-            // percent of population move to next generation
+            // 10 percent of population move to next generation
             begin = pop_size*0.01;
 
             copy_array(pop,next_pop,0,begin);
@@ -224,25 +199,21 @@ void ga(int str_size,char* target,int pop_size,int parallel){
                     pop[p2]->mutate(pop[p2]);
                 }
             
-            *next_pop[cap] = *pop[p1];
-            *next_pop[cap+1] = *pop[p2];
-            cap+=2;
+                *next_pop[cap] = *pop[p1];
+                *next_pop[cap+1] = *pop[p2];
+                cap+=2;
             }
 
-            if(parallel){
-                parallel_eval(next_pop,pop_size,target);
-            }
-            else
-            {
-                serial_eval(next_pop,pop_size,target);
-            }
+            serial_eval(next_pop,pop_size,target);
 
             qsort (next_pop, pop_size, sizeof(Individual*), compare);
             
-            copy_array(next_pop,pop,begin,pop_size);
+            copy_array(next_pop,pop,0,pop_size);
             
         }
-            
+    
+    qsort (pop, pop_size, sizeof(Individual*), compare);
+
     pop[0]->print(pop[0]);
 
     //freeing pointers
@@ -251,24 +222,31 @@ void ga(int str_size,char* target,int pop_size,int parallel){
             free(next_pop[i]); 
         }
 
+    // free the memory we allocated on the CPU
     free(pop);
     free(next_pop);
-
+    
     return;
 }
 int main(int argc , char* argv[]){
 
-	pop_size = atoi(argv[1]);
-    int parallel = atoi(argv[2]);
+    pop_size = atoi(argv[1]);
+    max_iteration = atoi(argv[2]);
+    full = atoi(argv[3]);
     
-    // pop_size = 800;
-    // int parallel = 0;
-    
-    printf("population size = %d \t max generation = %d \n ",pop_size,MAX_GENERATION);
+    printf("population size = %d \t max generation = %d \n ",pop_size,max_iteration);
 
     char target[30] = "HELLO WORLD";
     int str_size = strlen(target);
-    ga(str_size,target,pop_size,parallel);
- 
+
+    clock_t start = clock();
+
+    ga(str_size,target,pop_size,max_iteration,full);
+    
+    clock_t end = clock();
+    float seconds = (float)(end - start) *1000000 / CLOCKS_PER_SEC;
+    
+    printf("\nelapsed Time = %.1f microseconds \n",seconds);
+
     return 0;
 }
